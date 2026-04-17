@@ -26,7 +26,7 @@
 
         header {
             display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-            border-bottom: 5px solid var(--accent); padding: 15px 30px; margin-bottom: 20px;
+            border-bottom: 5px solid var(--accent); padding: 10px 30px; margin-bottom: 20px;
             background: rgba(0, 242, 255, 0.05);
         }
 
@@ -42,40 +42,44 @@
             gap: 25px;
             flex: 1;
             min-height: 0;
+            margin-bottom: 10px;
         }
 
         .left-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
-        .top-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; height: 40%; }
+        .top-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; height: 45%; }
         .bottom-row { flex: 1; display: flex; min-height: 0; }
 
-        .panel { background: var(--panel); border: 2px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.6); min-height: 0; width: 100%; box-sizing: border-box;}
-        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 20px; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
+        .right-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
 
-        .status-container { display: flex; flex-direction: column; gap: 12px; justify-content: center; flex: 1; }
-        .status-block { text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
+        .panel { background: var(--panel); border: 2px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.6); min-height: 0; width: 100%; box-sizing: border-box;}
+        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 15px; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
+
+        .status-container { display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1; }
+        .status-block { text-align: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
         .status-label { color: #fff; font-size: 2.2rem; text-transform: uppercase; font-weight: 900; display: block; }
         .status-val { font-size: 2.6rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 20px rgba(0, 255, 157, 0.4); }
 
-        .info-header { font-size: 1.9rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-        .release-inline { color: var(--muted); font-size: 1.5rem; font-weight: 600; margin-left: 10px; }
-        .version-badge { background: var(--accent); color: #000; padding: 4px 12px; font-weight: 900; border-radius: 6px; font-size: 1.6rem; }
+        .info-header { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .release-inline { color: var(--muted); font-size: 1.4rem; font-weight: 600; margin-left: 10px; }
+        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 6px; font-size: 1.5rem; }
 
         .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .delay-box { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 3px solid #334155; text-align: center;}
+        .delay-box { background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 3px solid #334155; text-align: center;}
         .delay-box.passed { border-color: var(--ok); color: var(--ok); }
         .delay-box.critical-target { border-color: var(--critical); color: var(--critical); }
-        .delay-date { font-size: 2.4rem; font-weight: 900; display: block; }
+        .delay-date { font-size: 2.3rem; font-weight: 900; display: block; }
 
-        .cve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; overflow-y: hidden; }
-        .sec-item { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; font-size: 1.6rem; }
-        .cve-id { color: var(--critical); font-weight: 800; font-family: monospace; font-size: 1.8rem; }
+        .cve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; overflow: hidden; align-content: start; }
+        .sec-item { margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; font-size: 1.5rem; }
+        .cve-id { color: var(--critical); font-weight: 800; font-family: monospace; font-size: 1.7rem; }
 
         .ticker-wrap { height: 90px; background: #0f172a; border-top: 5px solid var(--accent); display: flex; align-items: center; overflow: hidden; }
         .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 95s linear infinite; }
         .ticker-item { font-size: 2.5rem; font-weight: 700; color: var(--accent); padding-right: 120px; }
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        hr { border: 0; border-top: 2px solid rgba(255,255,255,0.1); margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -87,7 +91,7 @@
         <div id="date">00-00-0000</div>
     </div>
     <div style="text-align: right;">
-        <button style="background:none; border:2px solid var(--accent); color:var(--accent); padding:12px 25px; border-radius:8px; font-weight:bold; font-size: 1.3rem;">SOURCES OK</button>
+        <button style="background:none; border:2px solid var(--accent); color:var(--accent); padding:10px 25px; border-radius:8px; font-weight:bold; font-size: 1.3rem;">SOURCES OK</button>
     </div>
 </header>
 
@@ -104,7 +108,7 @@
             </div>
             <div class="panel">
                 <div class="panel-title">Deployment Tracker</div>
-                <div style="display: flex; flex-direction: column; gap: 20px; justify-content: center; flex: 1;">
+                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; flex: 1;">
                     <div id="mac-zone">
                         <div id="mac-info" class="info-header">Loading...</div>
                         <div id="mac-delays" class="delay-grid"></div>
@@ -126,14 +130,14 @@
         </div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 25px;">
+    <div class="right-content">
         <div class="panel" style="flex: 1.2;">
-            <div class="panel-title">Mac & iOS Security Advisories</div>
-            <div id="security-list"></div>
+            <div class="panel-title">Mac & iOS Advisories</div>
+            <div id="security-list" style="overflow: hidden;"></div>
         </div>
         <div class="panel" style="flex: 1;">
             <div class="panel-title">AI Security Intelligence</div>
-            <div style="font-size: 1.7rem; line-height: 1.5;">
+            <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1;">
                 <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren.</div>
                 <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test.</div>
                 <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
@@ -196,71 +200,4 @@
             let secHtml = '';
             mData.OSVersions[0].SecurityReleases.slice(0,4).forEach(r => {
                 secHtml += `<div class="sec-item">
-                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
-                </div>`;
-            });
-            document.getElementById('security-list').innerHTML = secHtml;
-        } catch(e) { console.error("Fetch error:", e); }
-    }
-
-    async function fetchCVEs() {
-        const cves = [
-            { id: "CVE-2026-2871", app: "Google Chrome V8 Engine", score: "9.8 CRITICAL" },
-            { id: "CVE-2026-1044", app: "Microsoft Windows Kernel", score: "8.4 HIGH" },
-            { id: "CVE-2026-0922", app: "Linux Ubuntu glibc", score: "7.8 HIGH" },
-            { id: "CVE-2026-3110", app: "OpenSSL Cryptography", score: "9.1 CRITICAL" },
-            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRITICAL" },
-            { id: "CVE-2026-5590", app: "VMware vCenter Server", score: "9.8 CRITICAL" }
-        ];
-        let html = '';
-        cves.forEach(c => {
-            html += `<div class="sec-item">
-                <span class="cve-id">${c.id}</span><br>
-                <b>${c.app}</b> <span style="color:var(--warning); font-size:1.3rem;">[${c.score}]</span>
-            </div>`;
-        });
-        document.getElementById('cve-feed-list').innerHTML = html;
-    }
-
-    function renderDelays(dateStr, containerId) {
-        const relDate = new Date(dateStr);
-        const now = new Date();
-        now.setHours(0,0,0,0);
-        let html = '';
-        [7, 14].forEach(d => {
-            const target = new Date(relDate);
-            target.setDate(target.getDate() + d);
-            const passed = now >= target;
-            html += `<div class="delay-box ${passed ? 'passed' : (d === 14 ? 'critical-target' : '')}">
-                <div style="font-size:1.3rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'T+14 CRIT' : 'T+7 DELAY'}</div>
-                <span class="delay-date">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
-            </div>`;
-        });
-        document.getElementById(containerId).innerHTML = html;
-    }
-
-    async function fetchNews() {
-        try {
-            const res = await fetch(proxy + encodeURIComponent(urls.news));
-            const d = await res.json();
-            const tickerFlow = document.getElementById('ticker-flow');
-            let content = `<div class="ticker-item" style="color:var(--warning)">+++ NCSC ALERT: AI-MODEL 'MYTHOS' VEREIST SNELLERE PATCH-CYCLI (UREN I.P.V. DAGEN) +++</div>`;
-            d.feed.entry.forEach(e => {
-                content += `<div class="ticker-item">+++ ${e.title.$t.toUpperCase()} +++</div>`;
-            });
-            tickerFlow.innerHTML = content + content;
-        } catch(e) { console.error("News error:", e); }
-    }
-
-    window.onload = () => {
-        updateTime(); 
-        setInterval(updateTime, 1000);
-        fetchData(); 
-        fetchNews(); 
-        fetchCVEs();
-        setInterval(fetchData, 600000);
-    };
-</script>
-
-</body>
-</html>
+                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">
