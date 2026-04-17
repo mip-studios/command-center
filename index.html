@@ -10,21 +10,22 @@
             --panel: rgba(15, 20, 35, 0.9);
             --accent: #00f2ff;
             --ok: #00ff9d;
-            --error: #ff0055;
+            --critical: #ff0055;
             --text: #e0e6ed;
             --muted: #6272a4;
         }
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             background: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         /* TV Scanline Effect */
@@ -41,90 +42,97 @@
         header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             border-bottom: 2px solid var(--accent);
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        h1 { margin: 0; font-size: 2.5rem; letter-spacing: 4px; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .title-group { display: flex; align-items: baseline; gap: 20px; }
+        h1 { margin: 0; font-size: 2.2rem; letter-spacing: 3px; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        #clock { font-size: 1.8rem; color: var(--muted); font-family: monospace; }
 
         .sources-wrapper { position: relative; }
+        #source-btn { background:none; border:1px solid var(--accent); color:var(--accent); cursor:pointer; padding: 5px 10px; }
         #source-list { 
-            display: none; 
-            position: absolute; 
-            right: 0; top: 30px; 
-            background: var(--panel); 
-            border: 1px solid var(--accent); 
-            padding: 10px; z-index: 1000; width: 250px; 
+            display: none; position: absolute; right: 0; top: 35px; 
+            background: var(--panel); border: 1px solid var(--accent); 
+            padding: 10px; z-index: 1000; width: 200px; backdrop-filter: blur(5px);
         }
 
         .grid {
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 20px;
-            flex-grow: 1;
+            gap: 15px;
+            flex: 1;
+            min-height: 0; /* Belangrijk voor scroll/overflow */
         }
 
         .panel {
             background: var(--panel);
             border: 1px solid rgba(0, 242, 255, 0.1);
-            padding: 20px;
+            padding: 15px;
             border-radius: 4px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .panel-title {
             color: var(--accent);
             text-transform: uppercase;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border-left: 4px solid var(--accent);
             padding-left: 10px;
+            font-size: 0.9rem;
         }
 
-        .status-val { font-size: 2rem; font-weight: bold; text-align: center; margin: 10px 0; }
-        .ok { color: var(--ok); text-shadow: 0 0 10px var(--ok); }
+        .status-block { text-align: center; margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); }
+        .status-label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; display: block; }
+        .status-val { font-size: 1.8rem; font-weight: bold; }
+        .ok { color: var(--ok); text-shadow: 0 0 8px var(--ok); }
 
-        .delay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .delay-box { 
-            background: rgba(0,0,0,0.3); 
-            padding: 10px; 
-            border-radius: 4px; 
-            text-align: center; 
-            border: 1px solid var(--muted);
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; 
+            text-align: center; border: 1px solid var(--muted);
         }
         .delay-box.passed { border-color: var(--ok); color: var(--ok); }
+        .delay-box.critical-target { border-color: var(--critical); color: var(--critical); box-shadow: inset 0 0 5px var(--critical); }
 
-        .version-badge { background: var(--accent); color: #000; padding: 2px 6px; font-weight: bold; border-radius: 3px; }
+        .version-badge { background: var(--accent); color: #000; padding: 2px 6px; font-weight: bold; border-radius: 3px; font-size: 0.9rem; }
 
         .ticker-wrap {
-            margin-top: 20px;
+            height: 40px;
+            margin-top: 10px;
             background: rgba(0, 242, 255, 0.05);
             border: 1px solid var(--accent);
-            padding: 10px;
+            display: flex;
+            align-items: center;
             overflow: hidden;
             white-space: nowrap;
         }
-        #ticker { display: inline-block; animation: scroll 40s linear infinite; font-weight: bold; color: var(--accent); }
+        #ticker { display: inline-block; animation: scroll 35s linear infinite; font-weight: bold; color: var(--accent); }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+        hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; width: 100%; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>
+    <div class="title-group">
         <h1>COMMAND CENTER</h1>
-        <div id="clock" style="font-size: 1.2rem; color: var(--muted);">--:--:--</div>
+        <div id="clock">00:00:00</div>
     </div>
     <div class="sources-wrapper">
-        <button onclick="document.getElementById('source-list').style.display = document.getElementById('source-list').style.display === 'block' ? 'none' : 'block'" 
-                style="background:none; border:1px solid var(--accent); color:var(--accent); cursor:pointer;">SOURCES ▼</button>
+        <button id="source-btn" onclick="toggleSources()">SOURCES ▼</button>
         <div id="source-list">
             <small>
-                • Apple & Google Status<br>
-                • SOFA v2 API<br>
+                • Apple Status API<br>
+                • Google Status API<br>
+                • SOFA v2 Feed<br>
                 • The Hacker News
             </small>
         </div>
@@ -134,43 +142,55 @@
 <div class="grid">
     <div class="panel">
         <div class="panel-title">System Health</div>
-        <small style="color:var(--muted)">APPLE</small>
-        <div class="status-val ok">Operational</div>
-        <small style="color:var(--muted); margin-top:20px;">GOOGLE SEARCH</small>
-        <div class="status-val ok">Stable</div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-title">Deployment Tracker</div>
-        <div id="mac-zone">
-            <div id="mac-info">Loading macOS...</div>
-            <div id="mac-delays" class="delay-grid"></div>
+        <div class="status-block">
+            <span class="status-label">Apple Systems</span>
+            <div class="status-val ok">OPERATIONAL</div>
         </div>
-        <hr style="width:100%; border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0;">
-        <div id="ios-zone">
-            <div id="ios-info">Loading iOS...</div>
-            <div id="ios-delays" class="delay-grid"></div>
+        <div class="status-block">
+            <span class="status-label">Google Systems</span>
+            <div class="status-val ok">OPERATIONAL</div>
+        </div>
+        <div style="margin-top: auto; font-size: 0.8rem; color: var(--muted); border: 1px dashed var(--muted); padding: 5px;">
+            LATEST NEWS:<br>
+            <span id="news-mini" style="color: var(--text)">Fetching security feed...</span>
         </div>
     </div>
 
     <div class="panel">
-        <div class="panel-title">Security Intel</div>
-        <div id="security-list" style="font-size: 0.9rem;">Wachten op data...</div>
+        <div class="panel-title">Fleet Deployment</div>
+        <div id="mac-info">Loading macOS...</div>
+        <div id="mac-delays" class="delay-grid"></div>
+        
+        <hr>
+        
+        <div id="ios-info">Loading iOS...</div>
+        <div id="ios-delays" class="delay-grid"></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Security Advisories</div>
+        <div id="security-list" style="font-size: 0.85rem; overflow-y: auto;">
+            Loading CVE streams...
+        </div>
     </div>
 </div>
 
 <div class="ticker-wrap">
-    <div id="ticker">SYSTEM STARTUP... INITIALIZING SECURE DATA STREAMS...</div>
+    <div id="ticker">INITIALIZING SECURE DATA STREAMS... SYSTEM ONLINE... MONITORING GLOBAL FLEET...</div>
 </div>
 
 <script>
-    // Gebruik een stabiele CORS proxy
     const proxy = "https://corsproxy.io/?";
     const urls = {
         mac: "https://sofa.macadmins.io/v2/macos_data_feed.json",
         ios: "https://sofa.macadmins.io/v2/ios_data_feed.json",
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=5"
     };
+
+    function toggleSources() {
+        const el = document.getElementById('source-list');
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
 
     function updateClock() {
         const el = document.getElementById('clock');
@@ -179,7 +199,6 @@
 
     async function fetchData() {
         try {
-            // macOS
             const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
             const mData = await mRes.json();
             const latestM = mData.OSVersions[0].Latest;
@@ -189,29 +208,24 @@
             `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
-            // iOS
             const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
             const iData = await iRes.json();
             const latestI = iData.OSVersions[0].Latest;
             
             document.getElementById('ios-info').innerHTML = `
-                <span class="version-badge">${latestI.ProductVersion}</span> <strong>iOS Release</strong>
+                <span class="version-badge">${latestI.ProductVersion}</span> <strong>iOS / iPadOS</strong>
             `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
-            // Security
             let secHtml = '';
-            mData.OSVersions[0].SecurityReleases.slice(0,5).forEach(r => {
-                secHtml += `<div style="margin-bottom:10px;">
-                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName}
+            mData.OSVersions[0].SecurityReleases.slice(0,6).forEach(r => {
+                secHtml += `<div style="margin-bottom:12px; border-bottom:1px solid rgba(0,242,255,0.05); padding-bottom:5px;">
+                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName} <small style="color:var(--critical)">(${r.UniqueCVEsCount || 0} CVEs)</small>
                 </div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
 
-        } catch(e) {
-            console.error(e);
-            document.getElementById('mac-info').textContent = "Data Error";
-        }
+        } catch(e) { console.error("Data error", e); }
     }
 
     function renderDelays(dateStr, containerId) {
@@ -220,13 +234,21 @@
         now.setHours(0,0,0,0);
         
         let html = '';
-        [7, 14, 21].forEach(d => {
+        const targets = [7, 14]; // Alleen 7 en 14
+        
+        targets.forEach(d => {
             const target = new Date(relDate);
             target.setDate(target.getDate() + d);
             const passed = now >= target;
-            html += `<div class="delay-box ${passed ? 'passed' : ''}">
-                <small>T+${d}</small><br>
-                <b>${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</b>
+            
+            // T+14 krijgt speciale 'critical' class
+            const isCritical = (d === 14);
+            const stateClass = passed ? 'passed' : (isCritical ? 'critical-target' : '');
+            const label = isCritical ? 'CRITICAL T+14' : 'DELAY T+7';
+
+            html += `<div class="delay-box ${stateClass}">
+                <small>${label}</small><br>
+                <b style="font-size:1.2rem">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</b>
             </div>`;
         });
         document.getElementById(containerId).innerHTML = html;
@@ -236,18 +258,20 @@
         try {
             const res = await fetch(proxy + encodeURIComponent(urls.news));
             const d = await res.json();
+            const entries = d.feed.entry;
+            document.getElementById('news-mini').textContent = entries[0].title.$t;
             let txt = " +++ ";
-            d.feed.entry.forEach(e => { txt += ` ALERT: ${e.title.$t} ••• `; });
+            entries.forEach(e => { txt += ` SECURITY ALERT: ${e.title.$t} ••• `; });
             document.getElementById('ticker').textContent = txt;
         } catch(e) {}
     }
 
-    // Start
     window.onload = () => {
         updateClock();
         setInterval(updateClock, 1000);
         fetchData();
         fetchNews();
+        setInterval(fetchData, 600000);
     };
 </script>
 
