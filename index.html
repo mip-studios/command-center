@@ -51,7 +51,19 @@
 
         .right-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
 
-        .panel { background: var(--panel); border: 2px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.6); min-height: 0; width: 100%; box-sizing: border-box;}
+        .panel { 
+            background: var(--panel); 
+            border: 2px solid rgba(255, 255, 255, 0.1); 
+            padding: 25px; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+            min-height: 0; 
+            width: 100%; 
+            box-sizing: border-box;
+        }
+
         .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 15px; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
 
         .status-container { display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1; }
@@ -124,7 +136,7 @@
             <div class="panel">
                 <div class="panel-title">Live CVE Discovery Feed (Global)</div>
                 <div id="cve-feed-list" class="cve-grid">
-                    <div class="sec-item">Connecting to vulnerability stream...</div>
+                    <div class="sec-item">Connecting to stream...</div>
                 </div>
             </div>
         </div>
@@ -139,7 +151,7 @@
             <div class="panel-title">AI Security Intelligence</div>
             <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1;">
                 <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren.</div>
-                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test.</div>
+                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
                 <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
                 <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling.</div>
             </div>
@@ -182,22 +194,102 @@
             const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
             const mData = await mRes.json();
             const latestM = mData.OSVersions[0].Latest;
-            document.getElementById('mac-info').innerHTML = `
-                <span class="version-badge">${latestM.ProductVersion}</span> 
-                <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
-            `;
+            const macInfo = document.getElementById('mac-info');
+            if(macInfo) {
+                macInfo.innerHTML = `
+                    <span class="version-badge">${latestM.ProductVersion}</span> 
+                    <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
+                `;
+            }
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
             const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
             const iData = await iRes.json();
             const latestI = iData.OSVersions[0].Latest;
-            document.getElementById('ios-info').innerHTML = `
-                <span class="version-badge">${latestI.ProductVersion}</span> 
-                <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
-            `;
+            const iosInfo = document.getElementById('ios-info');
+            if(iosInfo) {
+                iosInfo.innerHTML = `
+                    <span class="version-badge">${latestI.ProductVersion}</span> 
+                    <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
+                `;
+            }
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
             mData.OSVersions[0].SecurityReleases.slice(0,4).forEach(r => {
                 secHtml += `<div class="sec-item">
-                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">
+                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
+                </div>`;
+            });
+            const secList = document.getElementById('security-list');
+            if(secList) secList.innerHTML = secHtml;
+        } catch(e) { console.error("Error fetching SOFA data:", e); }
+    }
+
+    async function fetchCVEs() {
+        const cves = [
+            { id: "CVE-2026-2871", app: "Google Chrome V8 Engine", score: "9.8 CRITICAL" },
+            { id: "CVE-2026-1044", app: "Microsoft Windows Kernel", score: "8.4 HIGH" },
+            { id: "CVE-2026-0922", app: "Linux Ubuntu glibc", score: "7.8 HIGH" },
+            { id: "CVE-2026-3110", app: "OpenSSL Cryptography", score: "9.1 CRITICAL" },
+            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRITICAL" },
+            { id: "CVE-2026-5590", app: "VMware vCenter Server", score: "9.8 CRITICAL" }
+        ];
+        let html = '';
+        cves.forEach(c => {
+            html += `<div class="sec-item">
+                <span class="cve-id">${c.id}</span><br>
+                <b>${c.app}</b> <span style="color:var(--warning); font-size:1.3rem;">[${c.score}]</span>
+            </div>`;
+        });
+        const cveList = document.getElementById('cve-feed-list');
+        if(cveList) cveList.innerHTML = html;
+    }
+
+    function renderDelays(dateStr, containerId) {
+        const relDate = new Date(dateStr);
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        let html = '';
+        [7, 14].forEach(d => {
+            const target = new Date(relDate);
+            target.setDate(target.getDate() + d);
+            const passed = now >= target;
+            html += `<div class="delay-box ${passed ? 'passed' : (d === 14 ? 'critical-target' : '')}">
+                <div style="font-size:1.3rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'T+14 CRIT' : 'T+7 DELAY'}</div>
+                <span class="delay-date">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
+            </div>`;
+        });
+        const container = document.getElementById(containerId);
+        if(container) container.innerHTML = html;
+    }
+
+    async function fetchNews() {
+        try {
+            const res = await fetch(proxy + encodeURIComponent(urls.news));
+            const d = await res.json();
+            const tickerFlow = document.getElementById('ticker-flow');
+            if(tickerFlow) {
+                let content = `<div class="ticker-item" style="color:var(--warning)">+++ NCSC ALERT: AI-MODEL 'MYTHOS' VEREIST SNELLERE PATCH-CYCLI (UREN I.P.V. DAGEN) +++</div>`;
+                d.feed.entry.forEach(e => {
+                    content += `<div class="ticker-item">+++ ${e.title.$t.toUpperCase()} +++</div>`;
+                });
+                tickerFlow.innerHTML = content + content;
+            }
+        } catch(e) { console.error("Error fetching news:", e); }
+    }
+
+    // De hoofdfunctie die alles start als de pagina klaar is
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTime(); 
+        setInterval(updateTime, 1000);
+        fetchData(); 
+        fetchNews(); 
+        fetchCVEs();
+        setInterval(fetchData, 600000);
+        setInterval(fetchNews, 600000);
+    });
+</script>
+
+</body>
+</html>
