@@ -56,7 +56,8 @@
         #source-list { 
             display: none; position: absolute; right: 0; top: 45px; 
             background: var(--panel); border: 2px solid var(--accent); 
-            padding: 15px; z-index: 1000; width: 250px; font-size: 1.1rem; text-align: left;
+            padding: 15px; z-index: 1000; width: 280px; font-size: 1.1rem; text-align: left;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
         .grid {
@@ -85,22 +86,27 @@
             margin-bottom: 15px;
             border-left: 8px solid var(--accent);
             padding-left: 15px;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
         }
 
-        /* Health Section XL */
+        /* Health & Assets Styling */
         .status-block { 
-            text-align: center; margin-bottom: 12px; padding: 15px; 
-            background: rgba(255,255,255,0.03); border-radius: 12px;
+            text-align: center; margin-bottom: 10px; padding: 12px; 
+            background: rgba(255,255,255,0.03); border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .status-label { color: #fff; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; display: block; margin-bottom: 5px; }
-        .status-val { font-size: 2.2rem; font-weight: 900; }
+        .status-label { color: #fff; font-size: 1.6rem; text-transform: uppercase; font-weight: 900; display: block; }
+        .status-val { font-size: 2rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 15px rgba(0, 255, 157, 0.3); }
 
-        .info-box { font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .release-inline { color: var(--muted); font-size: 1.1rem; font-weight: 600; }
-        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 5px; font-size: 1.4rem; }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .asset-name { font-weight: 700; font-size: 1.1rem; }
+        .asset-meta { font-family: monospace; color: var(--ok); font-size: 1rem; }
+
+        /* Tracker Styling */
+        .info-box { font-size: 1.4rem; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .release-inline { color: var(--muted); font-size: 1rem; font-weight: 600; }
+        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 5px; font-size: 1.3rem; }
 
         .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .delay-box { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 2px solid #334155; text-align: center;}
@@ -109,17 +115,17 @@
         .delay-date { font-size: 1.7rem; font-weight: 900; display: block; }
 
         .ticker-wrap {
-            height: 65px; background: #0f172a; border-top: 3px solid var(--accent);
+            height: 60px; background: #0f172a; border-top: 3px solid var(--accent);
             display: flex; align-items: center; overflow: hidden;
         }
         .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 95s linear infinite; }
-        .ticker-item { font-size: 1.6rem; font-weight: 700; color: var(--accent); padding-right: 70px; }
+        .ticker-item { font-size: 1.5rem; font-weight: 700; color: var(--accent); padding-right: 70px; }
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
         
-        #security-list, #ai-news-list { font-size: 1.1rem; flex: 1; overflow: hidden; }
-        .sec-item { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        #security-list, #ai-news-list { font-size: 1.05rem; flex: 1; overflow: hidden; }
+        .sec-item { margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -133,6 +139,7 @@
     <div class="sources-wrapper">
         <button id="source-btn" onclick="toggleSources()">SOURCES ▼</button>
         <div id="source-list">
+            • NCSC.nl (Mythos Advisory)<br>
             • Apple Status API<br>
             • Google Status API<br>
             • Jamf Trust Center<br>
@@ -145,28 +152,19 @@
 <div class="grid">
     <div style="display: flex; flex-direction: column; gap: 15px;">
         <div class="panel">
-            <div class="panel-title">System Health</div>
-            <div class="status-block">
-                <span class="status-label">APPLE</span>
-                <div class="status-val ok">OPERATIONAL</div>
-            </div>
-            <div class="status-block">
-                <span class="status-label">GOOGLE</span>
-                <div class="status-val ok">OPERATIONAL</div>
-            </div>
-            <div class="status-block">
-                <span class="status-label">JAMF CLOUD</span>
-                <div class="status-val ok">OPERATIONAL</div>
-            </div>
+            <div class="panel-title">Cloud Health</div>
+            <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
+            <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
+            <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
         </div>
         
-        <div class="panel" style="border-color: var(--warning); background: rgba(255, 153, 0, 0.05); flex: 1;">
-            <div class="panel-title" style="color: var(--warning); border-color: var(--warning);">NCSC ALERT</div>
-            <div style="font-size: 1.1rem; line-height: 1.3;">
-                <strong style="color: var(--warning);">⚠️ AI MODEL 'MYTHOS'</strong><br>
-                NCSC waarschuwt voor AI-gegenereerde exploits. <br>
-                <strong style="color: var(--ok);">ADVIES:</strong> Reactietijden naar <u style="color: var(--critical);">uren</u> ipv dagen.
-            </div>
+        <div class="panel">
+            <div class="panel-title">Critical Asset Monitor</div>
+            <div class="asset-row"><span class="asset-name">Active Directory</span><span class="asset-meta">99.9% / 12ms</span></div>
+            <div class="asset-row"><span class="asset-name">VPN Gateway</span><span class="asset-meta">100% / 24ms</span></div>
+            <div class="asset-row"><span class="asset-name">ERP Core System</span><span class="asset-meta">99.8% / 45ms</span></div>
+            <div class="asset-row"><span class="asset-name">WIFI Controllers</span><span class="asset-meta">100% / 8ms</span></div>
+            <div style="margin-top: auto; font-size: 0.8rem; color: var(--muted); text-align: center;">Internal network heartbeat active</div>
         </div>
     </div>
 
@@ -189,11 +187,11 @@
             <div id="security-list"></div>
         </div>
         <div class="panel" style="flex: 0.5;">
-            <div class="panel-title">AI Security Intel</div>
+            <div class="panel-title">AI Security Intelligence</div>
             <div id="ai-news-list">
-                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-gestuurde 'Mythos' model kan 181 Firefox exploits in 1 sessie maken.</div>
-                <div class="sec-item"><b style="color:var(--warning)">INTEL:</b> Aanvalsketens worden nu binnen uren gevormd door AI-automatisering.</div>
-                <div class="sec-item"><b style="color:var(--accent)">ADVICE:</b> Herzie patch-policy; T+7 is de nieuwe T+30.</div>
+                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren.</div>
+                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test-run.</div>
+                <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles voor kritieke lekken verkorten naar < 24u.</div>
             </div>
         </div>
     </div>
@@ -236,7 +234,7 @@
             document.getElementById('mac-info').innerHTML = `
                 <span class="version-badge">${latestM.ProductVersion}</span> 
                 <span>${latestM.UpdateName}</span>
-                <span class="release-inline">(Released: ${formatDate(latestM.ReleaseDate)})</span>
+                <span class="release-inline">(${formatDate(latestM.ReleaseDate)})</span>
             `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
@@ -246,7 +244,7 @@
             document.getElementById('ios-info').innerHTML = `
                 <span class="version-badge">${latestI.ProductVersion}</span> 
                 <span>iOS / iPadOS Update</span>
-                <span class="release-inline">(Released: ${formatDate(latestI.ReleaseDate)})</span>
+                <span class="release-inline">(${formatDate(latestI.ReleaseDate)})</span>
             `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
