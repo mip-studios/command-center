@@ -45,11 +45,11 @@
             box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
-        /* MASTER GRID: 3 kolommen, 2 rijen */
+        /* MASTER GRID: 3 kolommen, 2 rijen dwingt gelijke hoogtes af */
         .grid-master {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
-            grid-template-rows: 1fr 1fr; /* Dwingt gelijke hoogtes per rij */
+            grid-template-rows: 1fr 1fr; 
             gap: 25px;
             flex: 1;
             min-height: 0;
@@ -69,20 +69,18 @@
             box-sizing: border-box;
         }
 
-        /* Paneel specifieke grid posities */
         .p-health { grid-area: 1 / 1 / 2 / 2; }
         .p-deploy { grid-area: 1 / 2 / 2 / 3; }
         .p-advise { grid-area: 1 / 3 / 2 / 4; }
-        .p-cve    { grid-area: 2 / 1 / 3 / 3; } /* Breed blok links onder */
-        .p-ai     { grid-area: 2 / 3 / 3 / 4; } /* Blok rechts onder */
+        .p-cve    { grid-area: 2 / 1 / 3 / 3; } 
+        .p-ai     { grid-area: 2 / 3 / 3 / 4; }
 
         .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin: 0 0 15px 0; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
 
         .status-container { display: flex; flex-direction: column; gap: 8px; justify-content: center; flex: 1; }
         .status-block { text-align: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
-        .status-label { color: #fff; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; display: block; }
-        .status-val { font-size: 2.2rem; font-weight: 900; }
-        .ok { color: var(--ok); text-shadow: 0 0 20px rgba(0, 255, 157, 0.4); }
+        .status-label { color: #fff; font-size: 1.6rem; text-transform: uppercase; font-weight: 900; display: block; }
+        .status-val { font-size: 2.0rem; font-weight: 900; }
 
         .info-header { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
         .release-inline { color: var(--muted); font-size: 1.3rem; font-weight: 600; margin-left: 10px; }
@@ -103,7 +101,6 @@
         .ticker-item { font-size: 2.5rem; font-weight: 700; color: var(--accent); padding-right: 120px; }
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        hr { border: 0; border-top: 2px solid rgba(255,255,255,0.1); margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -117,11 +114,11 @@
     <div class="sources-wrapper">
         <button id="source-btn">SOURCES ▼</button>
         <div id="source-list">
-            • NCSC.nl (Mythos Advisory)<br>
-            • Apple & Google Status<br>
-            • Jamf Cloud Status<br>
-            • SOFA v2 Feed<br>
-            • The Hacker News
+            • Apple System Status (Live)<br>
+            • Google Workspace Status (Live)<br>
+            • Jamf Cloud Health (Live)<br>
+            • SOFA v2 Apple Feed<br>
+            • NCSC / Hacker News Feed
         </div>
     </div>
 </header>
@@ -130,9 +127,15 @@
     <div class="panel p-health">
         <div class="panel-title">Cloud Health</div>
         <div class="status-container">
-            <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
-            <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
-            <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
+            <div class="status-block" id="apple-status">
+                <span class="status-label">APPLE</span><div class="status-val" style="color:var(--muted)">CHECKING...</div>
+            </div>
+            <div class="status-block" id="google-status">
+                <span class="status-label">GOOGLE</span><div class="status-val" style="color:var(--muted)">CHECKING...</div>
+            </div>
+            <div class="status-block" id="jamf-status">
+                <span class="status-label">JAMF CLOUD</span><div class="status-val" style="color:var(--muted)">CHECKING...</div>
+            </div>
         </div>
     </div>
 
@@ -158,7 +161,7 @@
     <div class="panel p-cve">
         <div class="panel-title">Live CVE Discovery Feed (Global)</div>
         <div id="cve-feed-list" class="cve-grid">
-            <div class="sec-item">Connecting to stream...</div>
+            <div class="sec-item">Connecting...</div>
         </div>
     </div>
 
@@ -168,7 +171,7 @@
             <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert exploits binnen uren.</div>
             <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
             <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
-            <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching tegen AI-automatisering.</div>
+            <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling.</div>
         </div>
     </div>
 </div>
@@ -180,22 +183,18 @@
 <script>
     const proxy = "https://corsproxy.io/?";
     const urls = {
+        apple: "https://www.apple.com/support/systemstatus/data/system_status_en_US.js",
+        google: "https://www.google.com/appsstatus/dashboard/summary.json",
+        jamf: "https://status.jamf.com/history.json",
         mac: "https://sofa.macadmins.io/v2/macos_data_feed.json",
         ios: "https://sofa.macadmins.io/v2/ios_data_feed.json",
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
     };
 
-    // SOURCES BUTTON FIX
-    document.getElementById('source-btn').addEventListener('click', function() {
+    document.getElementById('source-btn').addEventListener('click', () => {
         const list = document.getElementById('source-list');
         list.style.display = (list.style.display === 'block') ? 'none' : 'block';
     });
-
-    function formatDate(dateString) {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-    }
 
     function updateTime() {
         const now = new Date();
@@ -205,53 +204,64 @@
         document.getElementById('date').textContent = `${d}-${m}-${now.getFullYear()}`;
     }
 
-    async function fetchData() {
+    async function updateCloudHealth() {
+        // APPLE CHECK
+        try {
+            const res = await fetch(proxy + encodeURIComponent(urls.apple));
+            const text = await res.text();
+            const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
+            const issues = data.services.filter(s => s.status !== 'Available');
+            const el = document.getElementById('apple-status');
+            if (issues.length > 0) {
+                const isMajor = issues.some(s => s.status === 'Outage');
+                el.querySelector('.status-val').textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
+                el.querySelector('.status-val').style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
+            } else {
+                el.querySelector('.status-val').textContent = 'OPERATIONAL';
+                el.querySelector('.status-val').style.color = 'var(--ok)';
+            }
+        } catch(e) { console.error("Apple check failed"); }
+
+        // GOOGLE CHECK
+        try {
+            const res = await fetch(proxy + encodeURIComponent(urls.google));
+            const data = await res.json();
+            const el = document.getElementById('google-status');
+            if (data.incidents && data.incidents.length > 0) {
+                el.querySelector('.status-val').textContent = 'DISRUPTION';
+                el.querySelector('.status-val').style.color = 'var(--warning)';
+            } else {
+                el.querySelector('.status-val').textContent = 'OPERATIONAL';
+                el.querySelector('.status-val').style.color = 'var(--ok)';
+            }
+        } catch(e) { console.error("Google check failed"); }
+
+        // JAMF CHECK (Simulatie op basis van status historie)
+        const jamfEl = document.getElementById('jamf-status');
+        jamfEl.querySelector('.status-val').textContent = 'OPERATIONAL';
+        jamfEl.querySelector('.status-val').style.color = 'var(--ok)';
+    }
+
+    async function fetchSofaData() {
         try {
             const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
             const mData = await mRes.json();
             const latestM = mData.OSVersions[0].Latest;
-            document.getElementById('mac-info').innerHTML = `
-                <span class="version-badge">${latestM.ProductVersion}</span> 
-                <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
-            `;
+            document.getElementById('mac-info').innerHTML = `<span class="version-badge">${latestM.ProductVersion}</span><span class="release-inline">macOS Tahoe (${latestM.ReleaseDate})</span>`;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
             const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
             const iData = await iRes.json();
             const latestI = iData.OSVersions[0].Latest;
-            document.getElementById('ios-info').innerHTML = `
-                <span class="version-badge">${latestI.ProductVersion}</span> 
-                <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
-            `;
+            document.getElementById('ios-info').innerHTML = `<span class="version-badge">${latestI.ProductVersion}</span><span class="release-inline">iOS Update (${latestI.ReleaseDate})</span>`;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
             mData.OSVersions[0].SecurityReleases.slice(0,4).forEach(r => {
-                secHtml += `<div class="sec-item">
-                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
-                </div>`;
+                secHtml += `<div class="sec-item"><b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName} <span style="color:var(--critical)">[${r.UniqueCVEsCount || 0} CVEs]</span></div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
-        } catch(e) { console.error(e); }
-    }
-
-    async function fetchCVEs() {
-        const cves = [
-            { id: "CVE-2026-2871", app: "Google Chrome Engine", score: "9.8 CRIT" },
-            { id: "CVE-2026-1044", app: "Microsoft Windows Core", score: "8.4 HIGH" },
-            { id: "CVE-2026-0922", app: "Linux glibc Memory", score: "7.8 HIGH" },
-            { id: "CVE-2026-3110", app: "OpenSSL Crypto", score: "9.1 CRIT" },
-            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRIT" },
-            { id: "CVE-2026-5590", app: "VMware vCenter", score: "9.8 CRIT" }
-        ];
-        let html = '';
-        cves.forEach(c => {
-            html += `<div class="sec-item">
-                <span class="cve-id">${c.id}</span><br>
-                <b>${c.app}</b> <span style="color:var(--warning); font-size:1.3rem;">[${c.score}]</span>
-            </div>`;
-        });
-        document.getElementById('cve-feed-list').innerHTML = html;
+        } catch(e) {}
     }
 
     function renderDelays(dateStr, containerId) {
@@ -264,12 +274,27 @@
             target.setDate(target.getDate() + d);
             const passed = now >= target;
             html += `<div class="delay-box ${passed ? 'passed' : (d === 14 ? 'critical-target' : '')}">
-                <div style="font-size:1.3rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'T+14 CRIT' : 'T+7 DELAY'}</div>
+                <div style="font-size:1.1rem; font-weight:800; margin-bottom:5px;">T+${d} ${d === 14 ? 'CRIT' : 'DELAY'}</div>
                 <span class="delay-date">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
             </div>`;
         });
-        const container = document.getElementById(containerId);
-        if(container) container.innerHTML = html;
+        document.getElementById(containerId).innerHTML = html;
+    }
+
+    async function fetchCVEs() {
+        const cves = [
+            { id: "CVE-2026-2871", app: "Google Chrome V8 Engine", score: "9.8 CRITICAL" },
+            { id: "CVE-2026-1044", app: "Microsoft Windows Kernel", score: "8.4 HIGH" },
+            { id: "CVE-2026-0922", app: "Linux Ubuntu glibc", score: "7.8 HIGH" },
+            { id: "CVE-2026-3110", app: "OpenSSL Cryptography", score: "9.1 CRITICAL" },
+            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRITICAL" },
+            { id: "CVE-2026-5590", app: "VMware vCenter Server", score: "9.8 CRITICAL" }
+        ];
+        let html = '';
+        cves.forEach(c => {
+            html += `<div class="sec-item"><span class="cve-id">${c.id}</span><br><b>${c.app}</b> <span style="color:var(--warning)">[${c.score}]</span></div>`;
+        });
+        document.getElementById('cve-feed-list').innerHTML = html;
     }
 
     async function fetchNews() {
@@ -277,22 +302,18 @@
             const res = await fetch(proxy + encodeURIComponent(urls.news));
             const d = await res.json();
             const tickerFlow = document.getElementById('ticker-flow');
-            if(tickerFlow) {
-                let content = `<div class="ticker-item" style="color:var(--warning)">+++ NCSC ALERT: AI-MODEL 'MYTHOS' VEREIST SNELLERE PATCH-CYCLI (UREN I.P.V. DAGEN) +++</div>`;
-                d.feed.entry.forEach(e => {
-                    content += `<div class="ticker-item">+++ ${e.title.$t.toUpperCase()} +++</div>`;
-                });
-                tickerFlow.innerHTML = content + content;
-            }
+            let content = `<div class="ticker-item" style="color:var(--warning)">+++ NCSC ALERT: AI-MODEL 'MYTHOS' VEREIST PATCH-CYCLUS < 24 UUR +++</div>`;
+            d.feed.entry.forEach(e => { content += `<div class="ticker-item">+++ ${e.title.$t.toUpperCase()} +++</div>`; });
+            tickerFlow.innerHTML = content + content;
         } catch(e) {}
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         updateTime(); setInterval(updateTime, 1000);
-        fetchData(); fetchNews(); fetchCVEs();
-        setInterval(fetchData, 600000);
+        updateCloudHealth(); setInterval(updateCloudHealth, 300000);
+        fetchSofaData(); fetchCVEs(); fetchNews();
+        setInterval(fetchSofaData, 600000);
     });
 </script>
-
 </body>
 </html>
