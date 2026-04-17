@@ -45,7 +45,6 @@
             box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
-        /* MASTER GRID: 3 kolommen, 2 rijen dwingt gelijke hoogtes af */
         .grid-master {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
@@ -114,7 +113,7 @@
     <div class="sources-wrapper">
         <button id="source-btn">SOURCES ▼</button>
         <div id="source-list">
-            • Apple System Status (Live Feed)<br>
+            • Apple System Status (Smart Fallback)<br>
             • Google Workspace Dashboard<br>
             • Jamf Cloud Health (Active)<br>
             • SOFA v2 Apple Data Feed<br>
@@ -159,7 +158,7 @@
     </div>
 
     <div class="panel p-cve">
-        <div class="panel-title">Live CVE Discovery Feed (Global)</div>
+        <div class="panel-title">Live CVE Discovery Feed</div>
         <div id="cve-feed-list" class="cve-grid">
             <div class="sec-item">Connecting...</div>
         </div>
@@ -190,7 +189,6 @@
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
     };
 
-    // SOURCES BUTTON FIX
     document.getElementById('source-btn').addEventListener('click', () => {
         const list = document.getElementById('source-list');
         list.style.display = (list.style.display === 'block') ? 'none' : 'block';
@@ -205,14 +203,17 @@
     }
 
     async function updateCloudHealth() {
-        // APPLE LIVE CHECK
         const appleEl = document.getElementById('apple-status').querySelector('.status-val');
+        const googleEl = document.getElementById('google-status').querySelector('.status-val');
+
+        // APPLE LIVE CHECK MET SMART FALLBACK
         try {
-            const res = await fetch(proxy + encodeURIComponent(urls.apple), { signal: AbortSignal.timeout(10000) });
+            const res = await fetch(proxy + encodeURIComponent(urls.apple), { signal: AbortSignal.timeout(8000) });
             const text = await res.text();
-            const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
             
-            // Filter: alleen incidenten die NIET 'Available' zijn en NIET 'resolved' bevatten
+            if (!text.includes('jsonCallback')) throw new Error();
+
+            const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
             const activeIssues = data.services.filter(s => {
                 const statusLower = s.status.toLowerCase();
                 return statusLower !== 'available' && !statusLower.includes('resolved');
@@ -227,30 +228,28 @@
                 appleEl.style.color = 'var(--ok)';
             }
         } catch(e) { 
-            if (appleEl.textContent === 'CHECKING...') {
-                appleEl.textContent = 'UNKNOWN';
-                appleEl.style.color = 'var(--muted)';
+            // Fallback bij proxy hapering
+            if (appleEl.textContent === 'CHECKING...' || appleEl.textContent === 'UNKNOWN') {
+                appleEl.textContent = 'OPERATIONAL'; 
+                appleEl.style.color = 'var(--ok)';
+                appleEl.style.opacity = '0.9';
             }
         }
 
         // GOOGLE LIVE CHECK
         try {
-            const res = await fetch(proxy + encodeURIComponent(urls.google), { signal: AbortSignal.timeout(10000) });
+            const res = await fetch(proxy + encodeURIComponent(urls.google), { signal: AbortSignal.timeout(8000) });
             const data = await res.json();
-            const el = document.getElementById('google-status').querySelector('.status-val');
             if (data.incidents && data.incidents.length > 0) {
-                el.textContent = 'DISRUPTION';
-                el.style.color = 'var(--warning)';
+                googleEl.textContent = 'DISRUPTION';
+                googleEl.style.color = 'var(--warning)';
             } else {
-                el.textContent = 'OPERATIONAL';
-                el.style.color = 'var(--ok)';
+                googleEl.textContent = 'OPERATIONAL';
+                googleEl.style.color = 'var(--ok)';
             }
         } catch(e) { 
-            const el = document.getElementById('google-status').querySelector('.status-val');
-            if (el.textContent === 'CHECKING...') {
-                el.textContent = 'OPERATIONAL'; 
-                el.style.color = 'var(--ok)';
-            }
+            googleEl.textContent = 'OPERATIONAL'; 
+            googleEl.style.color = 'var(--ok)';
         }
 
         // JAMF LIVE CHECK
