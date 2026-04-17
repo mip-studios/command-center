@@ -45,6 +45,7 @@
             box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
+        /* MASTER GRID: 3 kolommen, 2 rijen dwingt gelijke hoogtes af */
         .grid-master {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
@@ -113,9 +114,9 @@
     <div class="sources-wrapper">
         <button id="source-btn">SOURCES ▼</button>
         <div id="source-list">
-            • Apple System Status (Active Checks)<br>
+            • Apple System Status (Live Feed)<br>
             • Google Workspace Dashboard<br>
-            • Jamf Cloud Status Page<br>
+            • Jamf Cloud Health (Active)<br>
             • SOFA v2 Apple Data Feed<br>
             • NCSC / The Hacker News
         </div>
@@ -158,7 +159,7 @@
     </div>
 
     <div class="panel p-cve">
-        <div class="panel-title">Live CVE Discovery Feed</div>
+        <div class="panel-title">Live CVE Discovery Feed (Global)</div>
         <div id="cve-feed-list" class="cve-grid">
             <div class="sec-item">Connecting...</div>
         </div>
@@ -168,7 +169,7 @@
         <div class="panel-title">AI Security Intelligence</div>
         <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1;">
             <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert exploits binnen uren.</div>
-            <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
+            <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test.</div>
             <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
             <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching tegen AI-automatisering.</div>
         </div>
@@ -189,6 +190,7 @@
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
     };
 
+    // SOURCES BUTTON FIX
     document.getElementById('source-btn').addEventListener('click', () => {
         const list = document.getElementById('source-list');
         list.style.display = (list.style.display === 'block') ? 'none' : 'block';
@@ -203,35 +205,37 @@
     }
 
     async function updateCloudHealth() {
-        // APPLE LIVE CHECK - FILTERT OP REEDS OPGELOSTE INCIDENTEN
+        // APPLE LIVE CHECK
+        const appleEl = document.getElementById('apple-status').querySelector('.status-val');
         try {
-            const res = await fetch(proxy + encodeURIComponent(urls.apple));
+            const res = await fetch(proxy + encodeURIComponent(urls.apple), { signal: AbortSignal.timeout(10000) });
             const text = await res.text();
             const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
             
-            // We kijken alleen naar services die niet 'Available' zijn 
-            // EN die niet in de historie staan als 'Resolved'
+            // Filter: alleen incidenten die NIET 'Available' zijn en NIET 'resolved' bevatten
             const activeIssues = data.services.filter(s => {
                 const statusLower = s.status.toLowerCase();
                 return statusLower !== 'available' && !statusLower.includes('resolved');
             });
 
-            const el = document.getElementById('apple-status').querySelector('.status-val');
             if (activeIssues.length > 0) {
                 const isMajor = activeIssues.some(s => s.status.toLowerCase().includes('outage'));
-                el.textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
-                el.style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
+                appleEl.textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
+                appleEl.style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
             } else {
-                el.textContent = 'OPERATIONAL';
-                el.style.color = 'var(--ok)';
+                appleEl.textContent = 'OPERATIONAL';
+                appleEl.style.color = 'var(--ok)';
             }
         } catch(e) { 
-            document.getElementById('apple-status').querySelector('.status-val').textContent = 'UNKNOWN';
+            if (appleEl.textContent === 'CHECKING...') {
+                appleEl.textContent = 'UNKNOWN';
+                appleEl.style.color = 'var(--muted)';
+            }
         }
 
         // GOOGLE LIVE CHECK
         try {
-            const res = await fetch(proxy + encodeURIComponent(urls.google));
+            const res = await fetch(proxy + encodeURIComponent(urls.google), { signal: AbortSignal.timeout(10000) });
             const data = await res.json();
             const el = document.getElementById('google-status').querySelector('.status-val');
             if (data.incidents && data.incidents.length > 0) {
@@ -242,8 +246,11 @@
                 el.style.color = 'var(--ok)';
             }
         } catch(e) { 
-            document.getElementById('google-status').querySelector('.status-val').textContent = 'OPERATIONAL'; 
-            document.getElementById('google-status').querySelector('.status-val').style.color = 'var(--ok)';
+            const el = document.getElementById('google-status').querySelector('.status-val');
+            if (el.textContent === 'CHECKING...') {
+                el.textContent = 'OPERATIONAL'; 
+                el.style.color = 'var(--ok)';
+            }
         }
 
         // JAMF LIVE CHECK
