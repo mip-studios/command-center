@@ -20,7 +20,7 @@
 
         body {
             margin: 0;
-            padding: 8px; /* Iets minder padding */
+            padding: 8px;
             background: var(--bg);
             color: var(--text);
             font-family: var(--font-main);
@@ -98,8 +98,8 @@
         .status-val { font-size: 2.2rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 15px rgba(0, 255, 157, 0.3); }
 
-        .info-box { font-size: 1.6rem; margin-bottom: 8px; font-weight: 700; }
-        .release-tag { color: var(--muted); font-size: 1rem; font-weight: 600; margin-left: 5px; }
+        .info-box { font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .release-inline { color: var(--muted); font-size: 1.1rem; font-weight: 600; }
         .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 5px; font-size: 1.4rem; }
 
         .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -193,6 +193,15 @@
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=8"
     };
 
+    function formatDate(dateString) {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}-${m}-${y}`;
+    }
+
     function updateTime() {
         const now = new Date();
         document.getElementById('clock').textContent = now.toLocaleTimeString('nl-NL');
@@ -208,8 +217,8 @@
             const latestM = mData.OSVersions[0].Latest;
             document.getElementById('mac-info').innerHTML = `
                 <span class="version-badge">${latestM.ProductVersion}</span> 
-                <span style="margin-left:10px">${latestM.UpdateName}</span>
-                <div class="release-tag">Released: ${latestM.ReleaseDate}</div>
+                <span>${latestM.UpdateName}</span>
+                <span class="release-inline">(Released: ${formatDate(latestM.ReleaseDate)})</span>
             `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
@@ -218,15 +227,15 @@
             const latestI = iData.OSVersions[0].Latest;
             document.getElementById('ios-info').innerHTML = `
                 <span class="version-badge">${latestI.ProductVersion}</span> 
-                <span style="margin-left:10px">iOS / iPadOS Update</span>
-                <div class="release-tag">Released: ${latestI.ReleaseDate}</div>
+                <span>iOS / iPadOS Update</span>
+                <span class="release-inline">(Released: ${formatDate(latestI.ReleaseDate)})</span>
             `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
             mData.OSVersions[0].SecurityReleases.slice(0,6).forEach(r => {
                 secHtml += `<div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
-                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0}]</span>
+                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0}]</span>
                 </div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
