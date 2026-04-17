@@ -36,20 +36,25 @@
         #clock, #date { font-size: 5.5rem; color: var(--text); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
         #date { color: var(--accent); }
 
+        .sources-wrapper { text-align: right; position: relative; }
+        #source-btn { background:none; border:2px solid var(--muted); color:var(--muted); padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 1.3rem; z-index: 1001; }
+        #source-list { 
+            display: none; position: absolute; right: 0; top: 55px; 
+            background: var(--panel); border: 2px solid var(--accent); 
+            padding: 20px; z-index: 1000; width: 300px; font-size: 1.2rem; text-align: left;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+        }
+
+        /* MASTER GRID: 3 kolommen, 2 rijen */
         .grid-master {
             display: grid;
-            grid-template-columns: 2.6fr 1.4fr;
+            grid-template-columns: 1fr 1.6fr 1.4fr;
+            grid-template-rows: 1fr 1fr; /* Dwingt gelijke hoogtes per rij */
             gap: 25px;
             flex: 1;
             min-height: 0;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-
-        .left-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
-        .top-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; height: 45%; }
-        .bottom-row { flex: 1; display: flex; min-height: 0; align-items: stretch; }
-
-        .right-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
 
         .panel { 
             background: var(--panel); 
@@ -64,17 +69,24 @@
             box-sizing: border-box;
         }
 
+        /* Paneel specifieke grid posities */
+        .p-health { grid-area: 1 / 1 / 2 / 2; }
+        .p-deploy { grid-area: 1 / 2 / 2 / 3; }
+        .p-advise { grid-area: 1 / 3 / 2 / 4; }
+        .p-cve    { grid-area: 2 / 1 / 3 / 3; } /* Breed blok links onder */
+        .p-ai     { grid-area: 2 / 3 / 3 / 4; } /* Blok rechts onder */
+
         .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin: 0 0 15px 0; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
 
-        .status-container { display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1; }
-        .status-block { text-align: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
-        .status-label { color: #fff; font-size: 2.2rem; text-transform: uppercase; font-weight: 900; display: block; }
-        .status-val { font-size: 2.6rem; font-weight: 900; }
+        .status-container { display: flex; flex-direction: column; gap: 8px; justify-content: center; flex: 1; }
+        .status-block { text-align: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
+        .status-label { color: #fff; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; display: block; }
+        .status-val { font-size: 2.2rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 20px rgba(0, 255, 157, 0.4); }
 
-        .info-header { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .release-inline { color: var(--muted); font-size: 1.4rem; font-weight: 600; margin-left: 10px; }
-        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 6px; font-size: 1.5rem; }
+        .info-header { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .release-inline { color: var(--muted); font-size: 1.3rem; font-weight: 600; margin-left: 10px; }
+        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 6px; font-size: 1.4rem; }
 
         .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .delay-box { background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 3px solid #334155; text-align: center;}
@@ -102,59 +114,61 @@
         <div id="clock">00:00:00</div>
         <div id="date">00-00-0000</div>
     </div>
-    <div style="text-align: right;">
-        <button style="background:none; border:2px solid var(--accent); color:var(--accent); padding:10px 25px; border-radius:8px; font-weight:bold; font-size: 1.3rem;">SOURCES OK</button>
+    <div class="sources-wrapper">
+        <button id="source-btn">SOURCES ▼</button>
+        <div id="source-list">
+            • NCSC.nl (Mythos Advisory)<br>
+            • Apple & Google Status<br>
+            • Jamf Cloud Status<br>
+            • SOFA v2 Feed<br>
+            • The Hacker News
+        </div>
     </div>
 </header>
 
 <div class="grid-master">
-    <div class="left-content">
-        <div class="top-row">
-            <div class="panel">
-                <div class="panel-title">Cloud Health</div>
-                <div class="status-container">
-                    <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
-                    <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
-                    <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
-                </div>
-            </div>
-            <div class="panel">
-                <div class="panel-title">Deployment Tracker</div>
-                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; flex: 1;">
-                    <div id="mac-zone">
-                        <div id="mac-info" class="info-header">Loading...</div>
-                        <div id="mac-delays" class="delay-grid"></div>
-                    </div>
-                    <div id="ios-zone">
-                        <div id="ios-info" class="info-header">Loading...</div>
-                        <div id="ios-delays" class="delay-grid"></div>
-                    </div>
-                </div>
-            </div>
+    <div class="panel p-health">
+        <div class="panel-title">Cloud Health</div>
+        <div class="status-container">
+            <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
+            <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
+            <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
         </div>
-        <div class="bottom-row">
-            <div class="panel">
-                <div class="panel-title">Live CVE Discovery Feed (Global)</div>
-                <div id="cve-feed-list" class="cve-grid">
-                    <div class="sec-item">Connecting to stream...</div>
-                </div>
+    </div>
+
+    <div class="panel p-deploy">
+        <div class="panel-title">Deployment Tracker</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1;">
+            <div id="mac-zone">
+                <div id="mac-info" class="info-header">Loading...</div>
+                <div id="mac-delays" class="delay-grid"></div>
+            </div>
+            <div id="ios-zone">
+                <div id="ios-info" class="info-header">Loading...</div>
+                <div id="ios-delays" class="delay-grid"></div>
             </div>
         </div>
     </div>
 
-    <div class="right-content">
-        <div class="panel" style="flex: 1.2;">
-            <div class="panel-title">Mac & iOS Advisories</div>
-            <div id="security-list" style="overflow: hidden;"></div>
+    <div class="panel p-advise">
+        <div class="panel-title">Mac & iOS Advisories</div>
+        <div id="security-list" style="overflow: hidden; flex: 1;"></div>
+    </div>
+
+    <div class="panel p-cve">
+        <div class="panel-title">Live CVE Discovery Feed (Global)</div>
+        <div id="cve-feed-list" class="cve-grid">
+            <div class="sec-item">Connecting to stream...</div>
         </div>
-        <div class="panel" style="flex: 1;">
-            <div class="panel-title">AI Security Intelligence</div>
-            <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1; padding: 10px 0;">
-                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren[cite: 1, 2].</div>
-                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test[cite: 1].</div>
-                <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u[cite: 1].</div>
-                <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling[cite: 1].</div>
-            </div>
+    </div>
+
+    <div class="panel p-ai">
+        <div class="panel-title">AI Security Intelligence</div>
+        <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1;">
+            <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert exploits binnen uren.</div>
+            <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
+            <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
+            <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching tegen AI-automatisering.</div>
         </div>
     </div>
 </div>
@@ -171,6 +185,12 @@
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
     };
 
+    // SOURCES BUTTON FIX
+    document.getElementById('source-btn').addEventListener('click', function() {
+        const list = document.getElementById('source-list');
+        list.style.display = (list.style.display === 'block') ? 'none' : 'block';
+    });
+
     function formatDate(dateString) {
         if (!dateString) return "";
         const date = new Date(dateString);
@@ -179,14 +199,10 @@
 
     function updateTime() {
         const now = new Date();
-        const clockEl = document.getElementById('clock');
-        const dateEl = document.getElementById('date');
-        if(clockEl) clockEl.textContent = now.toLocaleTimeString('nl-NL');
-        if(dateEl) {
-            const d = String(now.getDate()).padStart(2, '0');
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            dateEl.textContent = `${d}-${m}-${now.getFullYear()}`;
-        }
+        document.getElementById('clock').textContent = now.toLocaleTimeString('nl-NL');
+        const d = String(now.getDate()).padStart(2, '0');
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        document.getElementById('date').textContent = `${d}-${m}-${now.getFullYear()}`;
     }
 
     async function fetchData() {
@@ -194,25 +210,19 @@
             const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
             const mData = await mRes.json();
             const latestM = mData.OSVersions[0].Latest;
-            const macInfo = document.getElementById('mac-info');
-            if(macInfo) {
-                macInfo.innerHTML = `
-                    <span class="version-badge">${latestM.ProductVersion}</span> 
-                    <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
-                `;
-            }
+            document.getElementById('mac-info').innerHTML = `
+                <span class="version-badge">${latestM.ProductVersion}</span> 
+                <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
+            `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
             const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
             const iData = await iRes.json();
             const latestI = iData.OSVersions[0].Latest;
-            const iosInfo = document.getElementById('ios-info');
-            if(iosInfo) {
-                iosInfo.innerHTML = `
-                    <span class="version-badge">${latestI.ProductVersion}</span> 
-                    <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
-                `;
-            }
+            document.getElementById('ios-info').innerHTML = `
+                <span class="version-badge">${latestI.ProductVersion}</span> 
+                <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
+            `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
@@ -221,19 +231,18 @@
                     <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
                 </div>`;
             });
-            const secList = document.getElementById('security-list');
-            if(secList) secList.innerHTML = secHtml;
-        } catch(e) { console.error("Error fetching SOFA data:", e); }
+            document.getElementById('security-list').innerHTML = secHtml;
+        } catch(e) { console.error(e); }
     }
 
     async function fetchCVEs() {
         const cves = [
-            { id: "CVE-2026-2871", app: "Google Chrome V8 Engine", score: "9.8 CRITICAL" },
-            { id: "CVE-2026-1044", app: "Microsoft Windows Kernel", score: "8.4 HIGH" },
-            { id: "CVE-2026-0922", app: "Linux Ubuntu glibc", score: "7.8 HIGH" },
-            { id: "CVE-2026-3110", app: "OpenSSL Cryptography", score: "9.1 CRITICAL" },
-            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRITICAL" },
-            { id: "CVE-2026-5590", app: "VMware vCenter Server", score: "9.8 CRITICAL" }
+            { id: "CVE-2026-2871", app: "Google Chrome Engine", score: "9.8 CRIT" },
+            { id: "CVE-2026-1044", app: "Microsoft Windows Core", score: "8.4 HIGH" },
+            { id: "CVE-2026-0922", app: "Linux glibc Memory", score: "7.8 HIGH" },
+            { id: "CVE-2026-3110", app: "OpenSSL Crypto", score: "9.1 CRIT" },
+            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRIT" },
+            { id: "CVE-2026-5590", app: "VMware vCenter", score: "9.8 CRIT" }
         ];
         let html = '';
         cves.forEach(c => {
@@ -242,8 +251,7 @@
                 <b>${c.app}</b> <span style="color:var(--warning); font-size:1.3rem;">[${c.score}]</span>
             </div>`;
         });
-        const cveList = document.getElementById('cve-feed-list');
-        if(cveList) cveList.innerHTML = html;
+        document.getElementById('cve-feed-list').innerHTML = html;
     }
 
     function renderDelays(dateStr, containerId) {
@@ -276,17 +284,13 @@
                 });
                 tickerFlow.innerHTML = content + content;
             }
-        } catch(e) { console.error("Error fetching news:", e); }
+        } catch(e) {}
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        updateTime(); 
-        setInterval(updateTime, 1000);
-        fetchData(); 
-        fetchNews(); 
-        fetchCVEs();
+        updateTime(); setInterval(updateTime, 1000);
+        fetchData(); fetchNews(); fetchCVEs();
         setInterval(fetchData, 600000);
-        setInterval(fetchNews, 600000);
     });
 </script>
 
