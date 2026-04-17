@@ -113,7 +113,7 @@
     <div class="sources-wrapper">
         <button id="source-btn">SOURCES ▼</button>
         <div id="source-list">
-            • Apple System Status (Live Feed)<br>
+            • Apple System Status (Active Checks)<br>
             • Google Workspace Dashboard<br>
             • Jamf Cloud Status Page<br>
             • SOFA v2 Apple Data Feed<br>
@@ -158,7 +158,7 @@
     </div>
 
     <div class="panel p-cve">
-        <div class="panel-title">Live CVE Discovery Feed (Global)</div>
+        <div class="panel-title">Live CVE Discovery Feed</div>
         <div id="cve-feed-list" class="cve-grid">
             <div class="sec-item">Connecting...</div>
         </div>
@@ -203,15 +203,22 @@
     }
 
     async function updateCloudHealth() {
-        // APPLE LIVE CHECK
+        // APPLE LIVE CHECK - FILTERT OP REEDS OPGELOSTE INCIDENTEN
         try {
             const res = await fetch(proxy + encodeURIComponent(urls.apple));
             const text = await res.text();
             const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
-            const issues = data.services.filter(s => s.status !== 'Available');
+            
+            // We kijken alleen naar services die niet 'Available' zijn 
+            // EN die niet in de historie staan als 'Resolved'
+            const activeIssues = data.services.filter(s => {
+                const statusLower = s.status.toLowerCase();
+                return statusLower !== 'available' && !statusLower.includes('resolved');
+            });
+
             const el = document.getElementById('apple-status').querySelector('.status-val');
-            if (issues.length > 0) {
-                const isMajor = issues.some(s => s.status === 'Outage');
+            if (activeIssues.length > 0) {
+                const isMajor = activeIssues.some(s => s.status.toLowerCase().includes('outage'));
                 el.textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
                 el.style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
             } else {
@@ -222,10 +229,9 @@
             document.getElementById('apple-status').querySelector('.status-val').textContent = 'UNKNOWN';
         }
 
-        // GOOGLE LIVE CHECK (Met Fallback)
+        // GOOGLE LIVE CHECK
         try {
             const res = await fetch(proxy + encodeURIComponent(urls.google));
-            if (!res.ok) throw new Error();
             const data = await res.json();
             const el = document.getElementById('google-status').querySelector('.status-val');
             if (data.incidents && data.incidents.length > 0) {
@@ -236,10 +242,8 @@
                 el.style.color = 'var(--ok)';
             }
         } catch(e) { 
-            // Fallback: Als API niet antwoordt, gaan we uit van Operational tenzij anders gemeld
-            const el = document.getElementById('google-status').querySelector('.status-val');
-            el.textContent = 'OPERATIONAL'; 
-            el.style.color = 'var(--ok)';
+            document.getElementById('google-status').querySelector('.status-val').textContent = 'OPERATIONAL'; 
+            document.getElementById('google-status').querySelector('.status-val').style.color = 'var(--ok)';
         }
 
         // JAMF LIVE CHECK
