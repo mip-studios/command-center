@@ -20,7 +20,7 @@
 
         body {
             margin: 0;
-            padding: 10px;
+            padding: 8px; /* Iets minder padding */
             background: var(--bg);
             color: var(--text);
             font-family: var(--font-main);
@@ -31,40 +31,30 @@
             box-sizing: border-box;
         }
 
-        body::before {
-            content: " ";
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
-            background-size: 100% 8px;
-            z-index: -1;
-            pointer-events: none;
-        }
-
         header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            border-bottom: 4px solid var(--accent);
-            padding: 15px 30px;
-            margin-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+            padding: 10px 25px;
+            margin-bottom: 12px;
             background: rgba(0, 242, 255, 0.03);
         }
 
         h1 { 
-            margin: 0; font-size: 2.8rem; letter-spacing: 4px; color: var(--accent); 
+            margin: 0; font-size: 2.2rem; letter-spacing: 3px; color: var(--accent); 
             font-family: var(--font-display);
-            text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+            text-shadow: 0 0 12px rgba(0, 242, 255, 0.4);
         }
 
-        .center-clock-group { text-align: center; display: flex; flex-direction: column; }
-        #clock { font-size: 4.5rem; color: var(--text); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-        #date { font-size: 1.8rem; color: var(--accent); font-weight: 600; letter-spacing: 2px; }
+        .center-clock-group { text-align: center; }
+        #clock { font-size: 3.8rem; color: var(--text); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+        #date { font-size: 1.5rem; color: var(--accent); font-weight: 600; letter-spacing: 1px; }
 
         .grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
-            gap: 20px;
+            gap: 15px;
             flex: 1;
             min-height: 0;
         }
@@ -72,24 +62,23 @@
         .panel {
             background: var(--panel);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
 
         .panel-title {
             color: var(--accent);
             text-transform: uppercase;
             font-weight: 800;
-            margin-bottom: 20px;
-            border-left: 10px solid var(--accent);
-            padding-left: 20px;
-            font-size: 1.8rem;
+            margin-bottom: 15px;
+            border-left: 8px solid var(--accent);
+            padding-left: 15px;
+            font-size: 1.5rem;
         }
 
-        /* NCSC Alert Style */
         .threat-panel {
             border-color: var(--warning);
             background: rgba(255, 153, 0, 0.05);
@@ -97,36 +86,37 @@
         }
         @keyframes pulse-border {
             0% { border-color: rgba(255, 153, 0, 0.3); }
-            50% { border-color: rgba(255, 153, 0, 1); box-shadow: 0 0 15px rgba(255, 153, 0, 0.2); }
+            50% { border-color: rgba(255, 153, 0, 1); }
             100% { border-color: rgba(255, 153, 0, 0.3); }
         }
 
         .status-block { 
-            text-align: center; margin-bottom: 20px; padding: 20px; 
-            background: rgba(255,255,255,0.03); border-radius: 15px;
+            text-align: center; margin-bottom: 12px; padding: 15px; 
+            background: rgba(255,255,255,0.03); border-radius: 12px;
         }
-        .status-label { color: var(--muted); font-size: 1.2rem; text-transform: uppercase; font-weight: 600; }
-        .status-val { font-size: 2.8rem; font-weight: 900; }
-        .ok { color: var(--ok); text-shadow: 0 0 20px rgba(0, 255, 157, 0.4); }
+        .status-label { color: var(--muted); font-size: 1rem; text-transform: uppercase; font-weight: 600; }
+        .status-val { font-size: 2.2rem; font-weight: 900; }
+        .ok { color: var(--ok); text-shadow: 0 0 15px rgba(0, 255, 157, 0.3); }
 
-        .info-box { font-size: 2rem; margin-bottom: 10px; font-weight: 700; }
-        .version-badge { background: var(--accent); color: #000; padding: 4px 14px; font-weight: 900; border-radius: 6px; font-size: 1.6rem; }
+        .info-box { font-size: 1.6rem; margin-bottom: 8px; font-weight: 700; }
+        .release-tag { color: var(--muted); font-size: 1rem; font-weight: 600; margin-left: 5px; }
+        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 5px; font-size: 1.4rem; }
 
-        .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .delay-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 3px solid #334155; text-align: center;}
+        .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .delay-box { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 2px solid #334155; text-align: center;}
         .delay-box.passed { border-color: var(--ok); color: var(--ok); }
         .delay-box.critical-target { border-color: var(--critical); color: var(--critical); }
-        .delay-date { font-size: 2rem; font-weight: 900; display: block; }
+        .delay-date { font-size: 1.7rem; font-weight: 900; display: block; }
 
         .ticker-wrap {
-            height: 80px; background: #0f172a; border-top: 4px solid var(--accent);
+            height: 65px; background: #0f172a; border-top: 3px solid var(--accent);
             display: flex; align-items: center; overflow: hidden;
         }
-        .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 90s linear infinite; }
-        .ticker-item { font-size: 2rem; font-weight: 700; color: var(--accent); padding-right: 80px; }
+        .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 95s linear infinite; }
+        .ticker-item { font-size: 1.6rem; font-weight: 700; color: var(--accent); padding-right: 70px; }
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        hr { border: 0; border-top: 2px solid rgba(255,255,255,0.1); margin: 20px 0; }
+        hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -138,12 +128,12 @@
         <div id="date">00-00-0000</div>
     </div>
     <div style="text-align: right;">
-        <button id="source-btn" style="background:none; border:2px solid var(--muted); color:var(--muted); padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">SOURCES</button>
+        <button id="source-btn" style="background:none; border:1px solid var(--muted); color:var(--muted); padding:5px 15px; border-radius:4px; cursor:default; font-size:0.9rem;">SOURCES OK</button>
     </div>
 </header>
 
 <div class="grid">
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; flex-direction: column; gap: 15px;">
         <div class="panel">
             <div class="panel-title">System Health</div>
             <div class="status-block">
@@ -154,15 +144,19 @@
                 <span class="status-label">Google Services</span>
                 <div class="status-val ok">OPERATIONAL</div>
             </div>
+            <div class="status-block">
+                <span class="status-label">JamfCloud.com</span>
+                <div class="status-val ok">OPERATIONAL</div>
+            </div>
         </div>
         
-        <div class="panel threat-panel">
+        <div class="panel threat-panel" style="flex: 1;">
             <div class="panel-title" style="color: var(--warning); border-color: var(--warning);">NCSC ALERT</div>
-            <div style="font-size: 1.4rem; font-weight: 800; color: var(--warning); margin-bottom: 10px;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--warning); margin-bottom: 8px;">
                 ⚠️ AI MODEL 'MYTHOS' ACTIEF
             </div>
-            <div style="font-size: 1.2rem; line-height: 1.4; color: #fff;">
-                NCSC waarschuwt voor geautomatiseerde exploit-generatie. <br><br>
+            <div style="font-size: 1rem; line-height: 1.3;">
+                NCSC waarschuwt voor AI-gegenereerde exploits. <br>
                 <strong style="color: var(--ok);">ADVIES:</strong> Reactietijden naar <u style="color: var(--critical);">uren</u> ipv dagen. Patch-cycles drastisch verkorten.
             </div>
         </div>
@@ -183,13 +177,12 @@
 
     <div class="panel">
         <div class="panel-title">Security Advisories</div>
-        <div id="security-list" style="font-size: 1.4rem;"></div>
+        <div id="security-list" style="font-size: 1.2rem;"></div>
     </div>
 </div>
 
 <div class="ticker-wrap">
-    <div class="ticker-content" id="ticker-flow">
-        </div>
+    <div class="ticker-content" id="ticker-flow"></div>
 </div>
 
 <script>
@@ -213,19 +206,27 @@
             const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
             const mData = await mRes.json();
             const latestM = mData.OSVersions[0].Latest;
-            document.getElementById('mac-info').innerHTML = `<span class="version-badge">${latestM.ProductVersion}</span> <span style="margin-left:15px">${latestM.UpdateName}</span>`;
+            document.getElementById('mac-info').innerHTML = `
+                <span class="version-badge">${latestM.ProductVersion}</span> 
+                <span style="margin-left:10px">${latestM.UpdateName}</span>
+                <div class="release-tag">Released: ${latestM.ReleaseDate}</div>
+            `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
             const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
             const iData = await iRes.json();
             const latestI = iData.OSVersions[0].Latest;
-            document.getElementById('ios-info').innerHTML = `<span class="version-badge">${latestI.ProductVersion}</span> <span style="margin-left:15px">iOS / iPadOS</span>`;
+            document.getElementById('ios-info').innerHTML = `
+                <span class="version-badge">${latestI.ProductVersion}</span> 
+                <span style="margin-left:10px">iOS / iPadOS Update</span>
+                <div class="release-tag">Released: ${latestI.ReleaseDate}</div>
+            `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
-            mData.OSVersions[0].SecurityReleases.slice(0,5).forEach(r => {
-                secHtml += `<div style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
-                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
+            mData.OSVersions[0].SecurityReleases.slice(0,6).forEach(r => {
+                secHtml += `<div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
+                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0}]</span>
                 </div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
@@ -242,7 +243,7 @@
             target.setDate(target.getDate() + d);
             const passed = now >= target;
             html += `<div class="delay-box ${passed ? 'passed' : (d === 14 ? 'critical-target' : '')}">
-                <div style="font-size:1.1rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'CRITICAL T+14' : 'DELAY T+7'}</div>
+                <div style="font-size:0.9rem; font-weight:800; margin-bottom:3px;">${d === 14 ? 'CRITICAL T+14' : 'DELAY T+7'}</div>
                 <span class="delay-date">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
             </div>`;
         });
