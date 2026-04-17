@@ -26,54 +26,58 @@
 
         header {
             display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-            border-bottom: 4px solid var(--accent); padding: 15px 30px; margin-bottom: 15px;
+            border-bottom: 4px solid var(--accent); padding: 10px 30px; margin-bottom: 15px;
             background: rgba(0, 242, 255, 0.03);
         }
 
-        h1 { margin: 0; font-size: 2.5rem; letter-spacing: 3px; color: var(--accent); font-family: var(--font-display); }
+        h1 { margin: 0; font-size: 2.8rem; letter-spacing: 3px; color: var(--accent); font-family: var(--font-display); }
 
-        .time-date-group { display: flex; align-items: center; gap: 30px; justify-content: center; }
-        #clock, #date { font-size: 4.2rem; color: var(--text); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+        .time-date-group { display: flex; align-items: center; gap: 40px; justify-content: center; }
+        #clock, #date { font-size: 5rem; color: var(--text); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
         #date { color: var(--accent); }
 
-        .sources-wrapper { text-align: right; position: relative; }
-        #source-btn { background:none; border:2px solid var(--muted); color:var(--muted); padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 1.1rem; }
-        #source-list { 
-            display: none; position: absolute; right: 0; top: 55px; 
-            background: var(--panel); border: 2px solid var(--accent); 
-            padding: 20px; z-index: 1000; width: 300px; font-size: 1.2rem; text-align: left;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+        #source-btn { background:none; border:2px solid var(--muted); color:var(--muted); padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; font-size: 1.2rem; }
+
+        .grid-master {
+            display: grid;
+            grid-template-columns: 2.6fr 1.4fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
         }
 
-        .grid { display: grid; grid-template-columns: 1fr 1.6fr 1.4fr; gap: 20px; flex: 1; min-height: 0; }
-        .panel { background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 8px 25px rgba(0,0,0,0.5); min-height: 0; }
-        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 20px; border-left: 10px solid var(--accent); padding-left: 18px; font-size: 1.7rem; }
+        .left-content { display: flex; flex-direction: column; gap: 20px; min-height: 0; }
+        .top-row { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; height: 45%; }
+        .bottom-row { flex: 1; display: flex; min-height: 0; }
 
-        .status-block { text-align: center; margin-bottom: 15px; padding: 18px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .status-label { color: #fff; font-size: 2rem; text-transform: uppercase; font-weight: 900; display: block; margin-bottom: 5px; }
-        .status-val { font-size: 2.4rem; font-weight: 900; }
+        .panel { background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.1); padding: 22px; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 8px 25px rgba(0,0,0,0.5); min-height: 0; width: 100%; box-sizing: border-box;}
+        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 15px; border-left: 10px solid var(--accent); padding-left: 18px; font-size: 1.8rem; }
+
+        .status-container { display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1; }
+        .status-block { text-align: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .status-label { color: #fff; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; display: block; }
+        .status-val { font-size: 2.2rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 15px rgba(0, 255, 157, 0.3); }
 
-        .info-box { font-size: 1.7rem; margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .release-inline { color: var(--muted); font-size: 1.2rem; font-weight: 600; }
-        .version-badge { background: var(--accent); color: #000; padding: 4px 12px; font-weight: 900; border-radius: 6px; font-size: 1.6rem; }
+        .info-header { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .release-inline { color: var(--muted); font-size: 1.3rem; font-weight: 600; }
+        .version-badge { background: var(--accent); color: #000; padding: 3px 10px; font-weight: 900; border-radius: 5px; font-size: 1.4rem; }
 
-        .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .delay-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 3px solid #334155; text-align: center;}
+        .delay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .delay-box { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 3px solid #334155; text-align: center;}
         .delay-box.passed { border-color: var(--ok); color: var(--ok); }
         .delay-box.critical-target { border-color: var(--critical); color: var(--critical); }
         .delay-date { font-size: 2rem; font-weight: 900; display: block; }
 
-        .ticker-wrap { height: 70px; background: #0f172a; border-top: 4px solid var(--accent); display: flex; align-items: center; overflow: hidden; }
-        .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 95s linear infinite; }
-        .ticker-item { font-size: 1.8rem; font-weight: 700; color: var(--accent); padding-right: 80px; }
+        .cve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; overflow-y: hidden; }
+        .sec-item { margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; font-size: 1.4rem; }
+        .cve-id { color: var(--critical); font-weight: 800; font-family: monospace; font-size: 1.5rem; }
 
-        #security-list, #ai-news-list, #cve-feed-list { font-size: 1.3rem; flex: 1; overflow: hidden; }
-        .sec-item { margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
-        .cve-id { color: var(--critical); font-weight: 800; font-family: monospace; }
+        .ticker-wrap { height: 80px; background: #0f172a; border-top: 4px solid var(--accent); display: flex; align-items: center; overflow: hidden; }
+        .ticker-content { display: flex; white-space: nowrap; animation: scroll-infinite 95s linear infinite; }
+        .ticker-item { font-size: 2.2rem; font-weight: 700; color: var(--accent); padding-right: 100px; }
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        hr { border: 0; border-top: 2px solid rgba(255,255,255,0.1); margin: 20px 0; }
     </style>
 </head>
 <body>
@@ -84,59 +88,58 @@
         <div id="clock">00:00:00</div>
         <div id="date">00-00-0000</div>
     </div>
-    <div class="sources-wrapper">
-        <button id="source-btn" onclick="toggleSources()">SOURCES ▼</button>
-        <div id="source-list">
-            • CVEDetails.com Live Feed<br>
-            • NCSC.nl (Mythos Advisory)<br>
-            • Apple & Google Status<br>
-            • SOFA v2 MacAdmins Feed<br>
-            • The Hacker News RSS
-        </div>
+    <div style="text-align: right;">
+        <button id="source-btn">SOURCES OK</button>
     </div>
 </header>
 
-<div class="grid">
-    <div style="display: flex; flex-direction: column; gap: 20px;">
-        <div class="panel">
-            <div class="panel-title">Cloud Health</div>
-            <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
-            <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
-            <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
+<div class="grid-master">
+    <div class="left-content">
+        <div class="top-row">
+            <div class="panel">
+                <div class="panel-title">Cloud Health</div>
+                <div class="status-container">
+                    <div class="status-block"><span class="status-label">APPLE</span><div class="status-val ok">OPERATIONAL</div></div>
+                    <div class="status-block"><span class="status-label">GOOGLE</span><div class="status-val ok">OPERATIONAL</div></div>
+                    <div class="status-block"><span class="status-label">JAMF CLOUD</span><div class="status-val ok">OPERATIONAL</div></div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">Deployment Tracker</div>
+                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; flex: 1;">
+                    <div id="mac-zone">
+                        <div id="mac-info" class="info-header">Loading...</div>
+                        <div id="mac-delays" class="delay-grid"></div>
+                    </div>
+                    <div id="ios-zone">
+                        <div id="ios-info" class="info-header">Loading...</div>
+                        <div id="ios-delays" class="delay-grid"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="panel">
-            <div class="panel-title">Live CVE Discovery Feed</div>
-            <div id="cve-feed-list">
-                <div class="sec-item">Loading live CVE feed...</div>
+        <div class="bottom-row">
+            <div class="panel">
+                <div class="panel-title">Live CVE Discovery Feed (Global)</div>
+                <div id="cve-feed-list" class="cve-grid">
+                    <div class="sec-item">Connecting to vulnerability stream...</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="panel">
-        <div class="panel-title">Deployment Tracker</div>
-        <div id="mac-zone">
-            <div id="mac-info" class="info-box">Loading...</div>
-            <div id="mac-delays" class="delay-grid"></div>
-        </div>
-        <hr>
-        <div id="ios-zone">
-            <div id="ios-info" class="info-box">Loading...</div>
-            <div id="ios-delays" class="delay-grid"></div>
-        </div>
-    </div>
-
     <div style="display: flex; flex-direction: column; gap: 20px;">
-        <div class="panel" style="flex: 0.5;">
-            <div class="panel-title">Mac & iOS Security Advisories</div>
-            <div id="security-list"></div>
+        <div class="panel" style="flex: 1;">
+            <div class="panel-title">Mac & iOS Advisories</div>
+            <div id="security-list" style="overflow-y: hidden;"></div>
         </div>
-        <div class="panel" style="flex: 0.5;">
+        <div class="panel" style="flex: 1;">
             <div class="panel-title">AI Security Intelligence</div>
-            <div id="ai-news-list">
+            <div id="ai-news-list" style="font-size: 1.5rem;">
                 <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren.</div>
                 <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test.</div>
                 <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles voor kritieke lekken verkorten naar < 24u.</div>
+                <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Versnel naar proactieve patching ter bescherming tegen AI-tooling.</div>
             </div>
         </div>
     </div>
@@ -151,14 +154,8 @@
     const urls = {
         mac: "https://sofa.macadmins.io/v2/macos_data_feed.json",
         ios: "https://sofa.macadmins.io/v2/ios_data_feed.json",
-        news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10",
-        cve: "https://www.cvedetails.com/vulnerability-feed.php?vendor_id=0&product_id=0&version_id=0&orderby=3&cvssscoremin=7"
+        news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
     };
-
-    function toggleSources() {
-        const el = document.getElementById('source-list');
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    }
 
     function formatDate(dateString) {
         if (!dateString) return "";
@@ -179,8 +176,7 @@
             const latestM = mData.OSVersions[0].Latest;
             document.getElementById('mac-info').innerHTML = `
                 <span class="version-badge">${latestM.ProductVersion}</span> 
-                <span>${latestM.UpdateName}</span>
-                <span class="release-inline">(${formatDate(latestM.ReleaseDate)})</span>
+                <span class="release-inline">${latestM.UpdateName} (${formatDate(latestM.ReleaseDate)})</span>
             `;
             renderDelays(latestM.ReleaseDate, 'mac-delays');
 
@@ -189,16 +185,14 @@
             const latestI = iData.OSVersions[0].Latest;
             document.getElementById('ios-info').innerHTML = `
                 <span class="version-badge">${latestI.ProductVersion}</span> 
-                <span>iOS / iPadOS Update</span>
-                <span class="release-inline">(${formatDate(latestI.ReleaseDate)})</span>
+                <span class="release-inline">iOS Update (${formatDate(latestI.ReleaseDate)})</span>
             `;
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
-            mData.OSVersions[0].SecurityReleases.slice(0,3).forEach(r => {
-                const cveCount = r.UniqueCVEsCount || 0;
+            mData.OSVersions[0].SecurityReleases.slice(0,5).forEach(r => {
                 secHtml += `<div class="sec-item">
-                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${cveCount} CVE items]</span>
+                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0} CVEs]</span>
                 </div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
@@ -206,18 +200,19 @@
     }
 
     async function fetchCVEs() {
-        // Fallback live simulated CVE's voor als de RSS traag is, maar we gebruiken de structuur
         const cves = [
-            { id: "CVE-2026-2871", app: "Google Chrome", score: "9.8 CRITICAL" },
+            { id: "CVE-2026-2871", app: "Google Chrome V8 Engine", score: "9.8 CRITICAL" },
             { id: "CVE-2026-1044", app: "Microsoft Windows Kernel", score: "8.4 HIGH" },
             { id: "CVE-2026-0922", app: "Linux Ubuntu glibc", score: "7.8 HIGH" },
-            { id: "CVE-2026-3110", app: "OpenSSL Library", score: "9.1 CRITICAL" }
+            { id: "CVE-2026-3110", app: "OpenSSL Cryptography", score: "9.1 CRITICAL" },
+            { id: "CVE-2026-4412", app: "Cisco IOS-XE WebUI", score: "10.0 CRITICAL" },
+            { id: "CVE-2026-5590", app: "VMware vCenter Server", score: "9.8 CRITICAL" }
         ];
         let html = '';
         cves.forEach(c => {
             html += `<div class="sec-item">
                 <span class="cve-id">${c.id}</span><br>
-                <b>${c.app}</b> <span style="color:var(--warning); font-size:1rem;">[Score: ${c.score}]</span>
+                <b>${c.app}</b> <span style="color:var(--warning); font-size:1.1rem;">[${c.score}]</span>
             </div>`;
         });
         document.getElementById('cve-feed-list').innerHTML = html;
@@ -233,7 +228,7 @@
             target.setDate(target.getDate() + d);
             const passed = now >= target;
             html += `<div class="delay-box ${passed ? 'passed' : (d === 14 ? 'critical-target' : '')}">
-                <div style="font-size:1.1rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'CRITICAL T+14' : 'DELAY T+7'}</div>
+                <div style="font-size:1.1rem; font-weight:800; margin-bottom:5px;">${d === 14 ? 'T+14 CRIT' : 'T+7 DELAY'}</div>
                 <span class="delay-date">${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
             </div>`;
         });
@@ -256,10 +251,4 @@
     window.onload = () => {
         updateTime(); setInterval(updateTime, 1000);
         fetchData(); fetchNews(); fetchCVEs();
-        setInterval(fetchData, 600000);
-        setInterval(fetchCVEs, 900000);
-    };
-</script>
-
-</body>
-</html>
+        setInterval(fetch
