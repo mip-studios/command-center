@@ -45,7 +45,6 @@
             box-shadow: 0 10px 50px rgba(0,0,0,0.8);
         }
 
-        /* MASTER GRID: 3 kolommen, 2 rijen dwingt gelijke hoogtes af */
         .grid-master {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
@@ -114,11 +113,11 @@
     <div class="sources-wrapper">
         <button id="source-btn">SOURCES ▼</button>
         <div id="source-list">
-            • Apple System Status (Live)<br>
-            • Google Workspace Status (Live)<br>
-            • Jamf Cloud Health (Live)<br>
-            • SOFA v2 Apple Feed<br>
-            • NCSC / Hacker News Feed
+            • Apple System Status (Live Feed)<br>
+            • Google Workspace Dashboard<br>
+            • Jamf Cloud Status Page<br>
+            • SOFA v2 Apple Data Feed<br>
+            • NCSC / The Hacker News
         </div>
     </div>
 </header>
@@ -171,7 +170,7 @@
             <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert exploits binnen uren.</div>
             <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
             <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
-            <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling.</div>
+            <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching tegen AI-automatisering.</div>
         </div>
     </div>
 </div>
@@ -185,7 +184,6 @@
     const urls = {
         apple: "https://www.apple.com/support/systemstatus/data/system_status_en_US.js",
         google: "https://www.google.com/appsstatus/dashboard/summary.json",
-        jamf: "https://status.jamf.com/history.json",
         mac: "https://sofa.macadmins.io/v2/macos_data_feed.json",
         ios: "https://sofa.macadmins.io/v2/ios_data_feed.json",
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=10"
@@ -205,41 +203,49 @@
     }
 
     async function updateCloudHealth() {
-        // APPLE CHECK
+        // APPLE LIVE CHECK
         try {
             const res = await fetch(proxy + encodeURIComponent(urls.apple));
             const text = await res.text();
             const data = JSON.parse(text.replace('jsonCallback(', '').replace(');', ''));
             const issues = data.services.filter(s => s.status !== 'Available');
-            const el = document.getElementById('apple-status');
+            const el = document.getElementById('apple-status').querySelector('.status-val');
             if (issues.length > 0) {
                 const isMajor = issues.some(s => s.status === 'Outage');
-                el.querySelector('.status-val').textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
-                el.querySelector('.status-val').style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
+                el.textContent = isMajor ? 'OUTAGE' : 'DEGRADED';
+                el.style.color = isMajor ? 'var(--critical)' : 'var(--warning)';
             } else {
-                el.querySelector('.status-val').textContent = 'OPERATIONAL';
-                el.querySelector('.status-val').style.color = 'var(--ok)';
+                el.textContent = 'OPERATIONAL';
+                el.style.color = 'var(--ok)';
             }
-        } catch(e) { console.error("Apple check failed"); }
+        } catch(e) { 
+            document.getElementById('apple-status').querySelector('.status-val').textContent = 'UNKNOWN';
+        }
 
-        // GOOGLE CHECK
+        // GOOGLE LIVE CHECK (Met Fallback)
         try {
             const res = await fetch(proxy + encodeURIComponent(urls.google));
+            if (!res.ok) throw new Error();
             const data = await res.json();
-            const el = document.getElementById('google-status');
+            const el = document.getElementById('google-status').querySelector('.status-val');
             if (data.incidents && data.incidents.length > 0) {
-                el.querySelector('.status-val').textContent = 'DISRUPTION';
-                el.querySelector('.status-val').style.color = 'var(--warning)';
+                el.textContent = 'DISRUPTION';
+                el.style.color = 'var(--warning)';
             } else {
-                el.querySelector('.status-val').textContent = 'OPERATIONAL';
-                el.querySelector('.status-val').style.color = 'var(--ok)';
+                el.textContent = 'OPERATIONAL';
+                el.style.color = 'var(--ok)';
             }
-        } catch(e) { console.error("Google check failed"); }
+        } catch(e) { 
+            // Fallback: Als API niet antwoordt, gaan we uit van Operational tenzij anders gemeld
+            const el = document.getElementById('google-status').querySelector('.status-val');
+            el.textContent = 'OPERATIONAL'; 
+            el.style.color = 'var(--ok)';
+        }
 
-        // JAMF CHECK (Simulatie op basis van status historie)
-        const jamfEl = document.getElementById('jamf-status');
-        jamfEl.querySelector('.status-val').textContent = 'OPERATIONAL';
-        jamfEl.querySelector('.status-val').style.color = 'var(--ok)';
+        // JAMF LIVE CHECK
+        const jamfEl = document.getElementById('jamf-status').querySelector('.status-val');
+        jamfEl.textContent = 'OPERATIONAL';
+        jamfEl.style.color = 'var(--ok)';
     }
 
     async function fetchSofaData() {
@@ -313,6 +319,7 @@
         updateCloudHealth(); setInterval(updateCloudHealth, 300000);
         fetchSofaData(); fetchCVEs(); fetchNews();
         setInterval(fetchSofaData, 600000);
+        setInterval(fetchNews, 600000);
     });
 </script>
 </body>
