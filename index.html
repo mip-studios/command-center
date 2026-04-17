@@ -47,7 +47,7 @@
 
         .left-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
         .top-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; height: 45%; }
-        .bottom-row { flex: 1; display: flex; min-height: 0; }
+        .bottom-row { flex: 1; display: flex; min-height: 0; align-items: stretch; }
 
         .right-content { display: flex; flex-direction: column; gap: 25px; min-height: 0; }
 
@@ -64,7 +64,7 @@
             box-sizing: border-box;
         }
 
-        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin-bottom: 15px; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
+        .panel-title { color: var(--accent); text-transform: uppercase; font-weight: 800; margin: 0 0 15px 0; border-left: 12px solid var(--accent); padding-left: 20px; font-size: 2.1rem; }
 
         .status-container { display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1; }
         .status-block { text-align: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
@@ -82,7 +82,7 @@
         .delay-box.critical-target { border-color: var(--critical); color: var(--critical); }
         .delay-date { font-size: 2.3rem; font-weight: 900; display: block; }
 
-        .cve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; overflow: hidden; align-content: start; }
+        .cve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; overflow: hidden; align-content: start; flex: 1; }
         .sec-item { margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; font-size: 1.5rem; }
         .cve-id { color: var(--critical); font-weight: 800; font-family: monospace; font-size: 1.7rem; }
 
@@ -149,11 +149,11 @@
         </div>
         <div class="panel" style="flex: 1;">
             <div class="panel-title">AI Security Intelligence</div>
-            <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1;">
-                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren.</div>
-                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd.</div>
-                <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u.</div>
-                <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling.</div>
+            <div style="font-size: 1.7rem; line-height: 1.5; display: flex; flex-direction: column; justify-content: space-around; flex: 1; padding: 10px 0;">
+                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-model 'Mythos' genereert aanvalsketens binnen uren[cite: 1, 2].</div>
+                <div class="sec-item"><b style="color:var(--warning)">NCSC INTEL:</b> 181 Firefox exploits succesvol gegenereerd in test[cite: 1].</div>
+                <div class="sec-item"><b style="color:var(--accent)">ACTION:</b> Patch-cycles verkorten naar < 24u[cite: 1].</div>
+                <div class="sec-item"><b style="color:var(--ok)">STRATEGY:</b> Proactieve patching vereist tegen AI-tooling[cite: 1].</div>
             </div>
         </div>
     </div>
@@ -279,7 +279,6 @@
         } catch(e) { console.error("Error fetching news:", e); }
     }
 
-    // De hoofdfunctie die alles start als de pagina klaar is
     document.addEventListener('DOMContentLoaded', () => {
         updateTime(); 
         setInterval(updateTime, 1000);
