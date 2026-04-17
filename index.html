@@ -1,124 +1,149 @@
 <script>
-    // Gebruik een specifiekere proxy URL voor betere compatibiliteit
-    const PROXY = "https://api.allorigins.win/get?url=";
+    // Configuratie met meerdere proxies voor redundantie
+    const PROXIES = [
+        "https://api.allorigins.win/get?url=",
+        "https://thingproxy.freeboard.io/fetch/",
+        "https://corsproxy.io/?"
+    ];
+    
     const SOFA_MAC = "https://sofa.macadmins.io/v2/macos_data_feed.json";
     const SOFA_IOS = "https://sofa.macadmins.io/v2/ios_data_feed.json";
+    const HN_FEED  = "https://thehackernews.com/feeds/posts/default?alt=json&max-results=5";
 
-    function toggleSources() {
-        const list = document.getElementById('source-list');
-        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+    // Wacht tot de DOM volledig is opgebouwd voordat we elementen aanraken
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM geladen, start systemen...");
+        init();
+    });
+
+    function init() {
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        refreshData();
+        fetchNews();
+        
+        // Langere intervallen voor stabiliteit (geen rate-limiting)
+        setInterval(refreshData, 600000); // 10 min
+        setInterval(fetchNews, 900000);   // 15 min
     }
 
     function updateClock() {
-        document.getElementById('clock').textContent = new Date().toLocaleTimeString('nl-NL');
+        const clockEl = document.getElementById('clock');
+        if (clockEl) {
+            clockEl.textContent = new Date().toLocaleTimeString('nl-NL');
+        }
     }
-    setInterval(updateClock, 1000);
+
+    async function getJson(url) {
+        // We proberen de eerste proxy
+        try {
+            const response = await fetch(PROXIES[0] + encodeURIComponent(url));
+            if (!response.ok) throw new Error('Proxy error');
+            const data = await response.json();
+            return typeof data.contents === 'string' ? JSON.parse(data.contents) : data;
+        } catch (e) {
+            // Fallback naar de derde proxy (corsproxy.io is vaak erg stabiel)
+            console.warn("Switching proxy for: " + url);
+            const fbRes = await fetch(PROXIES[2] + encodeURIComponent(url));
+            return await fbRes.json();
+        }
+    }
 
     function calculateDelays(releaseDateStr, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
         const releaseDate = new Date(releaseDateStr);
-        if (isNaN(releaseDate)) return;
-        
         const now = new Date();
+        now.setHours(0,0,0,0);
+
         const delays = [7, 14, 21];
         let html = '';
 
         delays.forEach(days => {
             const targetDate = new Date(releaseDate);
             targetDate.setDate(targetDate.getDate() + days);
+            targetDate.setHours(0,0,0,0);
             
-            // Vergelijk puur op datum, niet op tijd
-            const isPassed = now.setHours(0,0,0,0) >= targetDate.setHours(0,0,0,0);
+            const isPassed = now >= targetDate;
             const statusClass = isPassed ? 'passed' : 'future';
             const icon = isPassed ? '✅' : '⏳';
             
             html += `
-                <div class="delay-box ${statusClass}">
-                    <span class="delay-label">${icon} T+${days}</span>
-                    <span class="delay-date">${targetDate.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</span>
+                <div class="delay-box ${statusClass}" style="border: 1px solid ${isPassed ? '#00ff9d' : '#6272a4'}; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.2);">
+                    <div style="font-size: 0.7rem; opacity: 0.8; text-transform: uppercase;">${icon} T+${days}</div>
+                    <div style="font-size: 1.1rem; font-weight: bold;">${targetDate.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</div>
                 </div>
             `;
         });
-        document.getElementById(containerId).innerHTML = html;
-    }
-
-    async function getJson(url) {
-        const response = await fetch(PROXY + encodeURIComponent(url));
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        // AllOrigins verpakt de data in een 'contents' string die we moeten parsen
-        return JSON.parse(data.contents);
+        container.innerHTML = html;
     }
 
     async function refreshData() {
         try {
-            // 1. macOS Data
             const macData = await getJson(SOFA_MAC);
             const latestMac = macData.OSVersions[0].Latest;
             
-            document.getElementById('mac-info').innerHTML = `
-                <span class="version-tag">${latestMac.ProductVersion}</span> 
-                <strong>${latestMac.UpdateName}</strong><br>
-                <small>Build: ${latestMac.Build} | Released: ${latestMac.ReleaseDate}</small>
-            `;
-            calculateDelays(latestMac.ReleaseDate, 'mac-delays');
+            const macInfoEl = document.getElementById('mac-info');
+            if (macInfoEl) {
+                macInfoEl.innerHTML = `
+                    <span class="version-tag" style="background: #00f2ff; color: #000; padding: 2px 6px; font-weight: bold;">${latestMac.ProductVersion}</span> 
+                    <strong style="font-size: 1.2rem; margin-left: 10px;">${latestMac.UpdateName}</strong><br>
+                    <small style="color: #6272a4;">Release: ${latestMac.ReleaseDate} | Build: ${latestMac.Build}</small>
+                `;
+                calculateDelays(latestMac.ReleaseDate, 'mac-delays');
+            }
 
-            // 2. iOS Data
             const iosData = await getJson(SOFA_IOS);
             const latestIos = iosData.OSVersions[0].Latest;
-
-            document.getElementById('ios-info').innerHTML = `
-                <span class="version-tag">${latestIos.ProductVersion}</span> 
-                <strong>iOS / iPadOS</strong><br>
-                <small>Released: ${latestIos.ReleaseDate}</small>
-            `;
-            calculateDelays(latestIos.ReleaseDate, 'ios-delays');
-
-            // 3. Security Advisory List
-            let secHtml = '';
-            const securityReleases = macData.OSVersions[0].SecurityReleases || [];
-            securityReleases.slice(0, 6).forEach(rel => {
-                const cveCount = rel.UniqueCVEsCount || 0;
-                const severity = cveCount > 10 ? 'error' : (cveCount > 0 ? 'warn' : 'ok');
-                secHtml += `
-                    <div style="margin-bottom: 12px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); padding-bottom: 8px;">
-                        <span style="color:var(--accent); font-weight:bold;">${rel.ReleaseDate}</span>
-                        <span style="float:right;" class="${severity}">${cveCount} CVEs</span><br>
-                        <span style="font-size:1.1rem;">${rel.UpdateName}</span>
-                    </div>
+            const iosInfoEl = document.getElementById('ios-info');
+            if (iosInfoEl) {
+                iosInfoEl.innerHTML = `
+                    <span class="version-tag" style="background: #00f2ff; color: #000; padding: 2px 6px; font-weight: bold;">${latestIos.ProductVersion}</span> 
+                    <strong style="font-size: 1.2rem; margin-left: 10px;">iOS / iPadOS</strong><br>
+                    <small style="color: #6272a4;">Release: ${latestIos.ReleaseDate}</small>
                 `;
-            });
-            document.getElementById('security-list').innerHTML = secHtml;
+                calculateDelays(latestIos.ReleaseDate, 'ios-delays');
+            }
+
+            // Security List
+            const secListEl = document.getElementById('security-list');
+            if (secListEl) {
+                let secHtml = '';
+                macData.OSVersions[0].SecurityReleases.slice(0, 5).forEach(rel => {
+                    secHtml += `
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(0,242,255,0.1); padding-bottom: 8px;">
+                            <span style="color:#00f2ff; font-weight: bold;">${rel.ReleaseDate}</span><br>
+                            <span style="font-size: 1.1rem;">${rel.UpdateName}</span><br>
+                            <small style="color: #ff0055;">CVEs: ${rel.UniqueCVEsCount || 'Maint. Update'}</small>
+                        </div>
+                    `;
+                });
+                secListEl.innerHTML = secHtml;
+            }
 
         } catch (e) {
-            console.error("Fout bij ophalen data:", e);
-            document.getElementById('mac-info').innerHTML = `<span class="error">DATA OFFLINE - Check Console</span>`;
+            console.error("SOFA Error:", e);
         }
     }
 
-    // Hacker News Feed via alternatieve weg als CORS lastig doet
     async function fetchNews() {
         try {
-            const newsData = await getJson("https://thehackernews.com/feeds/posts/default?alt=json&max-results=5");
+            const newsData = await getJson(HN_FEED);
             const entries = newsData.feed.entry;
-            
-            if(entries && entries.length > 0) {
-                const latestTitle = entries[0].title.$t;
-                document.getElementById('news-mini').innerHTML = latestTitle;
+            const newsMiniEl = document.getElementById('news-mini');
+            const tickerEl = document.getElementById('ticker-content');
+
+            if (entries && entries.length > 0) {
+                if (newsMiniEl) newsMiniEl.innerHTML = entries[0].title.$t;
                 
-                let ticker = "+++ SYSTEM ONLINE +++ ";
-                entries.forEach(e => { ticker += ` SECURITY ALERT: ${e.title.$t} ••• `; });
-                document.getElementById('ticker-content').textContent = ticker;
+                let ticker = " +++ MONITORING GLOBAL FLEET +++ ";
+                entries.forEach(e => { ticker += ` ALERT: ${e.title.$t} ••• `; });
+                if (tickerEl) tickerEl.textContent = ticker;
             }
         } catch (e) {
-            document.getElementById('news-mini').textContent = "News feed temporarily unavailable";
+            console.warn("News feed error");
         }
     }
-
-    // Start alles op
-    refreshData();
-    fetchNews();
-    
-    // Auto-refresh elke 15 minuten voor stabiliteit
-    setInterval(refreshData, 900000);
-    setInterval(fetchNews, 900000);
 </script>
