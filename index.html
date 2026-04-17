@@ -51,6 +51,14 @@
         #clock { font-size: 3.8rem; color: var(--text); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
         #date { font-size: 1.5rem; color: var(--accent); font-weight: 600; letter-spacing: 1px; }
 
+        .sources-wrapper { text-align: right; position: relative; }
+        #source-btn { background:none; border:2px solid var(--muted); color:var(--muted); padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold; }
+        #source-list { 
+            display: none; position: absolute; right: 0; top: 45px; 
+            background: var(--panel); border: 2px solid var(--accent); 
+            padding: 15px; z-index: 1000; width: 250px; font-size: 1.1rem; text-align: left;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr 1.4fr;
@@ -67,6 +75,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            min-height: 0;
         }
 
         .panel-title {
@@ -79,22 +88,13 @@
             font-size: 1.5rem;
         }
 
-        .threat-panel {
-            border-color: var(--warning);
-            background: rgba(255, 153, 0, 0.05);
-            animation: pulse-border 3s infinite;
-        }
-        @keyframes pulse-border {
-            0% { border-color: rgba(255, 153, 0, 0.3); }
-            50% { border-color: rgba(255, 153, 0, 1); }
-            100% { border-color: rgba(255, 153, 0, 0.3); }
-        }
-
+        /* Health Section XL */
         .status-block { 
             text-align: center; margin-bottom: 12px; padding: 15px; 
             background: rgba(255,255,255,0.03); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .status-label { color: var(--muted); font-size: 1rem; text-transform: uppercase; font-weight: 600; }
+        .status-label { color: #fff; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .status-val { font-size: 2.2rem; font-weight: 900; }
         .ok { color: var(--ok); text-shadow: 0 0 15px rgba(0, 255, 157, 0.3); }
 
@@ -117,6 +117,9 @@
 
         @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
+        
+        #security-list, #ai-news-list { font-size: 1.1rem; flex: 1; overflow: hidden; }
+        .sec-item { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -127,8 +130,15 @@
         <div id="clock">00:00:00</div>
         <div id="date">00-00-0000</div>
     </div>
-    <div style="text-align: right;">
-        <button id="source-btn" style="background:none; border:1px solid var(--muted); color:var(--muted); padding:5px 15px; border-radius:4px; cursor:default; font-size:0.9rem;">SOURCES OK</button>
+    <div class="sources-wrapper">
+        <button id="source-btn" onclick="toggleSources()">SOURCES ▼</button>
+        <div id="source-list">
+            • Apple Status API<br>
+            • Google Status API<br>
+            • Jamf Trust Center<br>
+            • SOFA v2 Feed<br>
+            • The Hacker News
+        </div>
     </div>
 </header>
 
@@ -137,27 +147,25 @@
         <div class="panel">
             <div class="panel-title">System Health</div>
             <div class="status-block">
-                <span class="status-label">Apple Fleet</span>
+                <span class="status-label">APPLE</span>
                 <div class="status-val ok">OPERATIONAL</div>
             </div>
             <div class="status-block">
-                <span class="status-label">Google Services</span>
+                <span class="status-label">GOOGLE</span>
                 <div class="status-val ok">OPERATIONAL</div>
             </div>
             <div class="status-block">
-                <span class="status-label">JamfCloud.com</span>
+                <span class="status-label">JAMF CLOUD</span>
                 <div class="status-val ok">OPERATIONAL</div>
             </div>
         </div>
         
-        <div class="panel threat-panel" style="flex: 1;">
+        <div class="panel" style="border-color: var(--warning); background: rgba(255, 153, 0, 0.05); flex: 1;">
             <div class="panel-title" style="color: var(--warning); border-color: var(--warning);">NCSC ALERT</div>
-            <div style="font-size: 1.2rem; font-weight: 800; color: var(--warning); margin-bottom: 8px;">
-                ⚠️ AI MODEL 'MYTHOS' ACTIEF
-            </div>
-            <div style="font-size: 1rem; line-height: 1.3;">
+            <div style="font-size: 1.1rem; line-height: 1.3;">
+                <strong style="color: var(--warning);">⚠️ AI MODEL 'MYTHOS'</strong><br>
                 NCSC waarschuwt voor AI-gegenereerde exploits. <br>
-                <strong style="color: var(--ok);">ADVIES:</strong> Reactietijden naar <u style="color: var(--critical);">uren</u> ipv dagen. Patch-cycles drastisch verkorten.
+                <strong style="color: var(--ok);">ADVIES:</strong> Reactietijden naar <u style="color: var(--critical);">uren</u> ipv dagen.
             </div>
         </div>
     </div>
@@ -175,9 +183,19 @@
         </div>
     </div>
 
-    <div class="panel">
-        <div class="panel-title">Security Advisories</div>
-        <div id="security-list" style="font-size: 1.2rem;"></div>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="panel" style="flex: 0.5;">
+            <div class="panel-title">Security Advisories</div>
+            <div id="security-list"></div>
+        </div>
+        <div class="panel" style="flex: 0.5;">
+            <div class="panel-title">AI Security Intel</div>
+            <div id="ai-news-list">
+                <div class="sec-item"><b style="color:var(--critical)">HIGH RISK:</b> AI-gestuurde 'Mythos' model kan 181 Firefox exploits in 1 sessie maken.</div>
+                <div class="sec-item"><b style="color:var(--warning)">INTEL:</b> Aanvalsketens worden nu binnen uren gevormd door AI-automatisering.</div>
+                <div class="sec-item"><b style="color:var(--accent)">ADVICE:</b> Herzie patch-policy; T+7 is de nieuwe T+30.</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -193,21 +211,21 @@
         news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=8"
     };
 
+    function toggleSources() {
+        const el = document.getElementById('source-list');
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
     function formatDate(dateString) {
         if (!dateString) return "";
         const date = new Date(dateString);
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear();
-        return `${d}-${m}-${y}`;
+        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
     }
 
     function updateTime() {
         const now = new Date();
         document.getElementById('clock').textContent = now.toLocaleTimeString('nl-NL');
-        const d = String(now.getDate()).padStart(2, '0');
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        document.getElementById('date').textContent = `${d}-${m}-${now.getFullYear()}`;
+        document.getElementById('date').textContent = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
     }
 
     async function fetchData() {
@@ -233,9 +251,10 @@
             renderDelays(latestI.ReleaseDate, 'ios-delays');
 
             let secHtml = '';
-            mData.OSVersions[0].SecurityReleases.slice(0,6).forEach(r => {
-                secHtml += `<div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
-                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${r.UniqueCVEsCount || 0}]</span>
+            mData.OSVersions[0].SecurityReleases.slice(0,3).forEach(r => {
+                const cveText = r.UniqueCVEsCount > 0 ? `${r.UniqueCVEsCount} CVE items` : "0 CVE items";
+                secHtml += `<div class="sec-item">
+                    <b style="color:var(--accent)">${formatDate(r.ReleaseDate)}</b><br>${r.UpdateName} <span style="color:var(--critical); font-weight:800">[${cveText}]</span>
                 </div>`;
             });
             document.getElementById('security-list').innerHTML = secHtml;
