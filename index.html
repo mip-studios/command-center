@@ -1,149 +1,255 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT OPS | COMMAND CENTER</title>
+    <style>
+        :root {
+            --bg: #05070a;
+            --panel: rgba(15, 20, 35, 0.9);
+            --accent: #00f2ff;
+            --ok: #00ff9d;
+            --error: #ff0055;
+            --text: #e0e6ed;
+            --muted: #6272a4;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* TV Scanline Effect */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: 4px; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+        .sources-wrapper { position: relative; }
+        #source-list { 
+            display: none; 
+            position: absolute; 
+            right: 0; top: 30px; 
+            background: var(--panel); 
+            border: 1px solid var(--accent); 
+            padding: 10px; z-index: 1000; width: 250px; 
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .status-val { font-size: 2rem; font-weight: bold; text-align: center; margin: 10px 0; }
+        .ok { color: var(--ok); text-shadow: 0 0 10px var(--ok); }
+
+        .delay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .delay-box { 
+            background: rgba(0,0,0,0.3); 
+            padding: 10px; 
+            border-radius: 4px; 
+            text-align: center; 
+            border: 1px solid var(--muted);
+        }
+        .delay-box.passed { border-color: var(--ok); color: var(--ok); }
+
+        .version-badge { background: var(--accent); color: #000; padding: 2px 6px; font-weight: bold; border-radius: 3px; }
+
+        .ticker-wrap {
+            margin-top: 20px;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid var(--accent);
+            padding: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        #ticker { display: inline-block; animation: scroll 40s linear infinite; font-weight: bold; color: var(--accent); }
+        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>COMMAND CENTER</h1>
+        <div id="clock" style="font-size: 1.2rem; color: var(--muted);">--:--:--</div>
+    </div>
+    <div class="sources-wrapper">
+        <button onclick="document.getElementById('source-list').style.display = document.getElementById('source-list').style.display === 'block' ? 'none' : 'block'" 
+                style="background:none; border:1px solid var(--accent); color:var(--accent); cursor:pointer;">SOURCES ▼</button>
+        <div id="source-list">
+            <small>
+                • Apple & Google Status<br>
+                • SOFA v2 API<br>
+                • The Hacker News
+            </small>
+        </div>
+    </div>
+</header>
+
+<div class="grid">
+    <div class="panel">
+        <div class="panel-title">System Health</div>
+        <small style="color:var(--muted)">APPLE</small>
+        <div class="status-val ok">Operational</div>
+        <small style="color:var(--muted); margin-top:20px;">GOOGLE SEARCH</small>
+        <div class="status-val ok">Stable</div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Deployment Tracker</div>
+        <div id="mac-zone">
+            <div id="mac-info">Loading macOS...</div>
+            <div id="mac-delays" class="delay-grid"></div>
+        </div>
+        <hr style="width:100%; border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0;">
+        <div id="ios-zone">
+            <div id="ios-info">Loading iOS...</div>
+            <div id="ios-delays" class="delay-grid"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Security Intel</div>
+        <div id="security-list" style="font-size: 0.9rem;">Wachten op data...</div>
+    </div>
+</div>
+
+<div class="ticker-wrap">
+    <div id="ticker">SYSTEM STARTUP... INITIALIZING SECURE DATA STREAMS...</div>
+</div>
+
 <script>
-    // Configuratie met meerdere proxies voor redundantie
-    const PROXIES = [
-        "https://api.allorigins.win/get?url=",
-        "https://thingproxy.freeboard.io/fetch/",
-        "https://corsproxy.io/?"
-    ];
-    
-    const SOFA_MAC = "https://sofa.macadmins.io/v2/macos_data_feed.json";
-    const SOFA_IOS = "https://sofa.macadmins.io/v2/ios_data_feed.json";
-    const HN_FEED  = "https://thehackernews.com/feeds/posts/default?alt=json&max-results=5";
-
-    // Wacht tot de DOM volledig is opgebouwd voordat we elementen aanraken
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log("DOM geladen, start systemen...");
-        init();
-    });
-
-    function init() {
-        updateClock();
-        setInterval(updateClock, 1000);
-        
-        refreshData();
-        fetchNews();
-        
-        // Langere intervallen voor stabiliteit (geen rate-limiting)
-        setInterval(refreshData, 600000); // 10 min
-        setInterval(fetchNews, 900000);   // 15 min
-    }
+    // Gebruik een stabiele CORS proxy
+    const proxy = "https://corsproxy.io/?";
+    const urls = {
+        mac: "https://sofa.macadmins.io/v2/macos_data_feed.json",
+        ios: "https://sofa.macadmins.io/v2/ios_data_feed.json",
+        news: "https://thehackernews.com/feeds/posts/default?alt=json&max-results=5"
+    };
 
     function updateClock() {
-        const clockEl = document.getElementById('clock');
-        if (clockEl) {
-            clockEl.textContent = new Date().toLocaleTimeString('nl-NL');
-        }
+        const el = document.getElementById('clock');
+        if(el) el.textContent = new Date().toLocaleTimeString('nl-NL');
     }
 
-    async function getJson(url) {
-        // We proberen de eerste proxy
+    async function fetchData() {
         try {
-            const response = await fetch(PROXIES[0] + encodeURIComponent(url));
-            if (!response.ok) throw new Error('Proxy error');
-            const data = await response.json();
-            return typeof data.contents === 'string' ? JSON.parse(data.contents) : data;
-        } catch (e) {
-            // Fallback naar de derde proxy (corsproxy.io is vaak erg stabiel)
-            console.warn("Switching proxy for: " + url);
-            const fbRes = await fetch(PROXIES[2] + encodeURIComponent(url));
-            return await fbRes.json();
+            // macOS
+            const mRes = await fetch(proxy + encodeURIComponent(urls.mac));
+            const mData = await mRes.json();
+            const latestM = mData.OSVersions[0].Latest;
+            
+            document.getElementById('mac-info').innerHTML = `
+                <span class="version-badge">${latestM.ProductVersion}</span> <strong>${latestM.UpdateName}</strong>
+            `;
+            renderDelays(latestM.ReleaseDate, 'mac-delays');
+
+            // iOS
+            const iRes = await fetch(proxy + encodeURIComponent(urls.ios));
+            const iData = await iRes.json();
+            const latestI = iData.OSVersions[0].Latest;
+            
+            document.getElementById('ios-info').innerHTML = `
+                <span class="version-badge">${latestI.ProductVersion}</span> <strong>iOS Release</strong>
+            `;
+            renderDelays(latestI.ReleaseDate, 'ios-delays');
+
+            // Security
+            let secHtml = '';
+            mData.OSVersions[0].SecurityReleases.slice(0,5).forEach(r => {
+                secHtml += `<div style="margin-bottom:10px;">
+                    <b style="color:var(--accent)">${r.ReleaseDate}</b><br>${r.UpdateName}
+                </div>`;
+            });
+            document.getElementById('security-list').innerHTML = secHtml;
+
+        } catch(e) {
+            console.error(e);
+            document.getElementById('mac-info').textContent = "Data Error";
         }
     }
 
-    function calculateDelays(releaseDateStr, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const releaseDate = new Date(releaseDateStr);
+    function renderDelays(dateStr, containerId) {
+        const relDate = new Date(dateStr);
         const now = new Date();
         now.setHours(0,0,0,0);
-
-        const delays = [7, 14, 21];
+        
         let html = '';
-
-        delays.forEach(days => {
-            const targetDate = new Date(releaseDate);
-            targetDate.setDate(targetDate.getDate() + days);
-            targetDate.setHours(0,0,0,0);
-            
-            const isPassed = now >= targetDate;
-            const statusClass = isPassed ? 'passed' : 'future';
-            const icon = isPassed ? '✅' : '⏳';
-            
-            html += `
-                <div class="delay-box ${statusClass}" style="border: 1px solid ${isPassed ? '#00ff9d' : '#6272a4'}; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.2);">
-                    <div style="font-size: 0.7rem; opacity: 0.8; text-transform: uppercase;">${icon} T+${days}</div>
-                    <div style="font-size: 1.1rem; font-weight: bold;">${targetDate.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</div>
-                </div>
-            `;
+        [7, 14, 21].forEach(d => {
+            const target = new Date(relDate);
+            target.setDate(target.getDate() + d);
+            const passed = now >= target;
+            html += `<div class="delay-box ${passed ? 'passed' : ''}">
+                <small>T+${d}</small><br>
+                <b>${target.toLocaleDateString('nl-NL', {day:'2-digit', month:'short'})}</b>
+            </div>`;
         });
-        container.innerHTML = html;
-    }
-
-    async function refreshData() {
-        try {
-            const macData = await getJson(SOFA_MAC);
-            const latestMac = macData.OSVersions[0].Latest;
-            
-            const macInfoEl = document.getElementById('mac-info');
-            if (macInfoEl) {
-                macInfoEl.innerHTML = `
-                    <span class="version-tag" style="background: #00f2ff; color: #000; padding: 2px 6px; font-weight: bold;">${latestMac.ProductVersion}</span> 
-                    <strong style="font-size: 1.2rem; margin-left: 10px;">${latestMac.UpdateName}</strong><br>
-                    <small style="color: #6272a4;">Release: ${latestMac.ReleaseDate} | Build: ${latestMac.Build}</small>
-                `;
-                calculateDelays(latestMac.ReleaseDate, 'mac-delays');
-            }
-
-            const iosData = await getJson(SOFA_IOS);
-            const latestIos = iosData.OSVersions[0].Latest;
-            const iosInfoEl = document.getElementById('ios-info');
-            if (iosInfoEl) {
-                iosInfoEl.innerHTML = `
-                    <span class="version-tag" style="background: #00f2ff; color: #000; padding: 2px 6px; font-weight: bold;">${latestIos.ProductVersion}</span> 
-                    <strong style="font-size: 1.2rem; margin-left: 10px;">iOS / iPadOS</strong><br>
-                    <small style="color: #6272a4;">Release: ${latestIos.ReleaseDate}</small>
-                `;
-                calculateDelays(latestIos.ReleaseDate, 'ios-delays');
-            }
-
-            // Security List
-            const secListEl = document.getElementById('security-list');
-            if (secListEl) {
-                let secHtml = '';
-                macData.OSVersions[0].SecurityReleases.slice(0, 5).forEach(rel => {
-                    secHtml += `
-                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(0,242,255,0.1); padding-bottom: 8px;">
-                            <span style="color:#00f2ff; font-weight: bold;">${rel.ReleaseDate}</span><br>
-                            <span style="font-size: 1.1rem;">${rel.UpdateName}</span><br>
-                            <small style="color: #ff0055;">CVEs: ${rel.UniqueCVEsCount || 'Maint. Update'}</small>
-                        </div>
-                    `;
-                });
-                secListEl.innerHTML = secHtml;
-            }
-
-        } catch (e) {
-            console.error("SOFA Error:", e);
-        }
+        document.getElementById(containerId).innerHTML = html;
     }
 
     async function fetchNews() {
         try {
-            const newsData = await getJson(HN_FEED);
-            const entries = newsData.feed.entry;
-            const newsMiniEl = document.getElementById('news-mini');
-            const tickerEl = document.getElementById('ticker-content');
-
-            if (entries && entries.length > 0) {
-                if (newsMiniEl) newsMiniEl.innerHTML = entries[0].title.$t;
-                
-                let ticker = " +++ MONITORING GLOBAL FLEET +++ ";
-                entries.forEach(e => { ticker += ` ALERT: ${e.title.$t} ••• `; });
-                if (tickerEl) tickerEl.textContent = ticker;
-            }
-        } catch (e) {
-            console.warn("News feed error");
-        }
+            const res = await fetch(proxy + encodeURIComponent(urls.news));
+            const d = await res.json();
+            let txt = " +++ ";
+            d.feed.entry.forEach(e => { txt += ` ALERT: ${e.title.$t} ••• `; });
+            document.getElementById('ticker').textContent = txt;
+        } catch(e) {}
     }
+
+    // Start
+    window.onload = () => {
+        updateClock();
+        setInterval(updateClock, 1000);
+        fetchData();
+        fetchNews();
+    };
 </script>
+
+</body>
+</html>
